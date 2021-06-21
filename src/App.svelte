@@ -1,12 +1,13 @@
 <script lang="ts">
 	import DrawingSection from "./Components/DrawingSection.svelte";
+	import Keyboard from "./Components/Keyboard.svelte";
 	let color = "#ff3e00";
 
 </script>
 
 <main style="--color: {color}">
-<!--	<h1>DRAW SOMETHING!</h1>-->
 	<DrawingSection/>
+	<Keyboard/>
 </main>
 
 <style>
