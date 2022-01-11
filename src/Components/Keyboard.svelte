@@ -6,22 +6,30 @@
         defaultOptions,
         getPoints
     } from 'svg-piano';
-    import {waveform} from "../stores";
+    // import {waveform} from "../stores";
 
-    export let options = {scaleX: 2};
+    export let options = {
+        scaleX: 2,
+        strokeWidth: 2
+    };
     options = defaultOptions(options)
     let keys = renderKeys()
 
     const dimensions = totalDimensions(options).map(
         v => Math.round(v) + options.strokeWidth * 2
     );
+
     function keyClicked(key, index) {
-        waveform.play("none")
+        console.log('i: ', index)
         console.log("key: ", key)
-        keys = keys.map((_key, i) => {
-            const fill = key.fill === "purple" ? key.notes.length === 2 ? "#39383D" : "#F2F2EF" : "purple"
+        keys = keys.map((_key) => {
+            const fill = key.fill === "purple"
+                ? key.notes.length === 2  && key.notes[0].split('').includes('b') ? "#39383D" : "#F2F2EF"
+                : "purple"
             return key === _key ? {...key, fill} : _key
         });
+
+        // waveform.play("none")
     }
 </script>
 
@@ -48,7 +56,7 @@
 
 <style>
     .Keyboard {
-        width: 100vw;
+        width: 100v;
     }
 
     .Keyboard svg {
