@@ -1,23 +1,28 @@
 import {readable, writable, derived, get, Readable, Writable} from "svelte/store";
 import {tick} from "svelte";
 import _ from "lodash";
+import type {Note} from "./music";
+
+type Point = [number, number]
 
 const createWaveform = () => {
-    const points: Writable<number[][]> = writable([[0, 0]]);
+    const points: Writable<Point[]> = writable([[0, 0]]);
     const lastUpdatedIndex: Writable<number> = writable(0);
     const isDrawing: Writable<boolean> = writable(false);
     const svgPath: Readable<string> = derived(points, ($points) => (
         `M ${_.flattenDeep($points).join(" ")}`
     ))
+    type AudioNodesObject = Partial<{ [key in Note]: AudioBufferSourceNode }>;
+    const audioNodes: Writable<AudioNodesObject> = writable({});
 
-    const audioCtx = new AudioContext();
+    const audioCtx = new window.AudioContext();
     const osc = audioCtx.createOscillator();
 
-    const addPoint = (pt: number[]) => {
+    const addPoint = (pt: Point) => {
         /// ADD A POINT TO THE WAVEFORM REPRESENTATION
-        const greaterOrEqual = (pt2: number[]): boolean => pt2[0] >= pt[0];
-        points.update((points: number[][]): number[][] => {
-            let insertionIndex: number = points.findIndex(greaterOrEqual);
+        const greaterOrEqualX = (pt2: Point): boolean => pt2[0] >= pt[0];
+        points.update((points): Point[] => {
+            let insertionIndex: number = points.findIndex(greaterOrEqualX);
             insertionIndex = insertionIndex >= 0 ? insertionIndex : points.length - 1;
             let deleteCount: number = 0;
             let unzipped: number[][] = _.unzip(points);
@@ -44,6 +49,7 @@ const createWaveform = () => {
             points.splice(insertionIndex, deleteCount, pt);
             lastUpdatedIndex.set(insertionIndex);
             tick();
+            points.sort((a, b) => a[0] - b[0]);
             return points;
         })
     }
@@ -85,12 +91,30 @@ const createWaveform = () => {
         addPoint,
         fill: calcAllPoints,
         play: (note) => {
-            // audioCtx.createPeriodicWave()
-            // osc.setPeriodicWave()
-            osc.setPeriodicWave(_.unzip(get(points))[0])
-            osc.start();
-            osc.stop(2);
+            let wav = _.unzip(get(points))[0]
+            const audioNode = audioCtx.createBufferSource();
+            let buffer = audioCtx.createBuffer(2, wav.length ,audioCtx.sampleRate);
+            for (let chan = 0; chan < 2; chan++) {
+                const channelBuffer = buffer.getChannelData(chan);
+                for (let i = 0; i < buffer.length; i++) {
+                    channelBuffer[i] = wav[i];
+                }
+            }
 
+            audioNode.buffer = buffer;
+            audioNode.loop = true;
+            audioNode.connect(audioCtx.destination);
+            audioNode.start();
+            audioNodes.update((current) => ({...current, [note]: audioNode}))
+        },
+        stop: (note) => {
+            if (note in get(audioNodes)) {
+                audioNodes.update((current) => {
+                    current[note].stop();
+                    delete current[note];
+                    return current;
+                });
+            }
         },
         svgPath,
         get isDrawing(): boolean {

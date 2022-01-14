@@ -1,6 +1,6 @@
 import {
     enforceAllFlats,
-    flatToSharp,
+    flatToSharp, getNoteFrequency,
     isBlack,
     isFlat,
     isSharp,
@@ -59,5 +59,16 @@ describe('test for music.ts', () => {
                 enforceAllFlats(['Ab', 'C#', 'B', 'F#'])
             ).toEqual(['Ab', 'Db', 'B', 'Gb']);
         });
+    })
+    describe('getNoteFrequency', () => {
+        it('should give 24.5 for G0', () => {
+            expect(getNoteFrequency('G0')).toEqual(24.5);
+        })
+        it('should give 440 for A4', () => {
+            expect(getNoteFrequency('A4')).toEqual(440)
+        })
+        it('should give 1244.51 for Eb6', () => {
+            expect(getNoteFrequency('Eb6')).toEqual(1244.8);
+        })
     })
 });

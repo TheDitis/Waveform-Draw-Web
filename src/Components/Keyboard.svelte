@@ -6,30 +6,37 @@
         defaultOptions,
         getPoints
     } from 'svg-piano';
-    // import {waveform} from "../stores";
+    import {waveform} from "../stores";
+    import type {BaseKey, Key} from "../types/keyboardTypes";
+    import {addIsPlayingToAllKeys} from "../types/keyboardTypes";
 
     export let options = {
         scaleX: 2,
         strokeWidth: 2
     };
     options = defaultOptions(options)
-    let keys = renderKeys()
+    let keys: Key[] = addIsPlayingToAllKeys(renderKeys() as BaseKey[]);
+
+    console.log('keys: ', keys)
 
     const dimensions = totalDimensions(options).map(
         v => Math.round(v) + options.strokeWidth * 2
     );
 
     function keyClicked(key, index) {
-        console.log('i: ', index)
-        console.log("key: ", key)
-        keys = keys.map((_key) => {
-            const fill = key.fill === "purple"
-                ? key.notes.length === 2  && key.notes[0].split('').includes('b') ? "#39383D" : "#F2F2EF"
-                : "purple"
-            return key === _key ? {...key, fill} : _key
-        });
-
-        // waveform.play("none")
+        if (key.isPlaying) {
+            key.isPlaying = false;
+            waveform.stop(key.notes[0]);
+            key.fill = key.notes.length === 2  && key.notes[0].split('').includes('b') ? "#39383D" : "#F2F2EF";
+            console.log('stopping ', key)
+        } else {
+            key.isPlaying = true;
+            waveform.play(key.notes[0]);
+            key.fill = 'purple'
+            console.log('playing ', key);
+        }
+        keys.splice(index, key);
+        keys = keys;
     }
 </script>
 
@@ -56,7 +63,7 @@
 
 <style>
     .Keyboard {
-        width: 100v;
+        width: 100vw;
     }
 
     .Keyboard svg {

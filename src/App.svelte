@@ -17,17 +17,10 @@
 		width: 100%;
 		height: 100%;
 		postion: absolute;
-		top: -50;
+		top: -50px;
 		padding: 0;
 		margin: 0;
 		/*box-sizing: border-box;*/
 		/*border: 2px solid black;*/
-	}
-
-	h1 {
-		color: var(--color);
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
 	}
 </style>
