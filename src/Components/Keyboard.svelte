@@ -28,7 +28,6 @@
             key.isPlaying = false;
             waveform.stop(key.notes[0]);
             key.fill = key.notes.length === 2  && key.notes[0].split('').includes('b') ? "#39383D" : "#F2F2EF";
-            console.log('stopping ', key)
         } else {
             key.isPlaying = true;
             waveform.play(key.notes[0]);

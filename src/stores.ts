@@ -6,7 +6,7 @@ import type {Note} from "./music";
 type Point = [number, number]
 
 const createWaveform = () => {
-    const points: Writable<Point[]> = writable([[0, 0]]);
+    const points: Writable<Point[]> = writable([[0, 0], [0, 0]]);
     const lastUpdatedIndex: Writable<number> = writable(0);
     const isDrawing: Writable<boolean> = writable(false);
     const svgPath: Readable<string> = derived(points, ($points) => (
@@ -16,7 +16,6 @@ const createWaveform = () => {
     const audioNodes: Writable<AudioNodesObject> = writable({});
 
     const audioCtx = new window.AudioContext();
-    const osc = audioCtx.createOscillator();
 
     const addPoint = (pt: Point) => {
         /// ADD A POINT TO THE WAVEFORM REPRESENTATION
@@ -48,10 +47,12 @@ const createWaveform = () => {
 
             points.splice(insertionIndex, deleteCount, pt);
             lastUpdatedIndex.set(insertionIndex);
-            tick();
             points.sort((a, b) => a[0] - b[0]);
             return points;
-        })
+        });
+        if (Object.keys(get(audioNodes)).length) {
+            updateAllPlayingNotes();
+        }
     }
 
     // // TODO: Finish this. Filling in waveform data in between drawn points
@@ -82,6 +83,46 @@ const createWaveform = () => {
     //     }
     //     return output
     // }
+    const updateExistingNode = (note, node) => {
+        node.buffer = pointsToAudioBuffer();
+    }
+
+    const pointsToAudioBuffer = (): AudioBuffer => {
+        let wav = _.unzip(get(points))[1];
+        let max = Math.max(...wav);
+        let min = Math.min(...wav);
+        let mid = (max - min) / 2;
+        console.log('max: ', max);
+        console.log('min: ', min);
+        console.log('mid: ', mid);
+        wav = wav.map((val) => {
+            return (val - mid) / mid;
+        })
+        let buffer = audioCtx.createBuffer(2, wav.length, audioCtx.sampleRate);
+        for (let chan = 0; chan < 2; chan++) {
+            const channelBuffer = buffer.getChannelData(chan);
+            for (let i = 0; i < buffer.length; i++) {
+                channelBuffer[i] = wav[i];
+            }
+        }
+        return buffer;
+    }
+
+    const play = (note) => {
+        const audioNode = audioCtx.createBufferSource();
+        audioNode.buffer = pointsToAudioBuffer()
+        audioNode.loop = true;
+        audioNode.connect(audioCtx.destination);
+        audioNode.start();
+        audioNodes.update((current) => ({...current, [note]: audioNode}))
+
+    }
+
+    const updateAllPlayingNotes = async () => {
+        Object.entries(get(audioNodes)).forEach(([note, node]) => {
+            updateExistingNode(note, node);
+        })
+    }
 
     const calcAllPoints = (): number[] => [1, 2, 3]
 
@@ -90,23 +131,7 @@ const createWaveform = () => {
         set: points.set,
         addPoint,
         fill: calcAllPoints,
-        play: (note) => {
-            let wav = _.unzip(get(points))[0]
-            const audioNode = audioCtx.createBufferSource();
-            let buffer = audioCtx.createBuffer(2, wav.length ,audioCtx.sampleRate);
-            for (let chan = 0; chan < 2; chan++) {
-                const channelBuffer = buffer.getChannelData(chan);
-                for (let i = 0; i < buffer.length; i++) {
-                    channelBuffer[i] = wav[i];
-                }
-            }
-
-            audioNode.buffer = buffer;
-            audioNode.loop = true;
-            audioNode.connect(audioCtx.destination);
-            audioNode.start();
-            audioNodes.update((current) => ({...current, [note]: audioNode}))
-        },
+        play,
         stop: (note) => {
             if (note in get(audioNodes)) {
                 audioNodes.update((current) => {
