@@ -15,6 +15,8 @@ const createWaveform = () => {
     type AudioNodesObject = Partial<{ [key in Note]: AudioBufferSourceNode }>;
     const audioNodes: Writable<AudioNodesObject> = writable({});
 
+    let sampleInterval;
+
     const audioCtx = new window.AudioContext();
 
     const addPoint = (pt: Point) => {
@@ -50,9 +52,6 @@ const createWaveform = () => {
             points.sort((a, b) => a[0] - b[0]);
             return points;
         });
-        if (Object.keys(get(audioNodes)).length) {
-            updateAllPlayingNotes();
-        }
     }
 
     // // TODO: Finish this. Filling in waveform data in between drawn points
@@ -83,9 +82,7 @@ const createWaveform = () => {
     //     }
     //     return output
     // }
-    const updateExistingNode = (note, node) => {
-        node.buffer = pointsToAudioBuffer();
-    }
+
 
     const pointsToAudioBuffer = (): AudioBuffer => {
         let wav = _.unzip(get(points))[1];
@@ -113,13 +110,28 @@ const createWaveform = () => {
         audioNode.connect(audioCtx.destination);
         audioNode.start();
         audioNodes.update((current) => ({...current, [note]: audioNode}))
-
     }
 
-    const updateAllPlayingNotes = async () => {
-        Object.entries(get(audioNodes)).forEach(([note, node]) => {
-            updateExistingNode(note, node);
+    const updateExistingNode = (note) => {
+        const audioNode = audioCtx.createBufferSource();
+        audioNode.buffer = pointsToAudioBuffer()
+        audioNode.loop = true;
+        audioNode.connect(audioCtx.destination);
+        audioNode.start();
+        return audioNode;
+    }
+
+    const updateAllPlayingNotes = () => {
+        audioNodes.update((nodes) => {
+            Object.entries(get(audioNodes)).forEach(([note, node]) => {
+                node.stop();
+                node.disconnect(audioCtx.destination);
+                delete nodes[note];
+                nodes[note] = updateExistingNode(note);
+            })
+            return nodes;
         })
+
     }
 
     const calcAllPoints = (): number[] => [1, 2, 3]
@@ -145,15 +157,16 @@ const createWaveform = () => {
         },
         startDraw: () => {
             isDrawing.set(true);
+            if (Object.keys(get(audioNodes)).length) {
+                sampleInterval = setInterval(updateAllPlayingNotes, 200);
+            }
         },
         endDraw: () => {
             isDrawing.set(false);
-            // let filled = calcAllPoints()
-            // filled = points;
-            // console.log("filled: ", filled)
-            // let filled2 = filled.map((v, i) => [i, v])
-            // console.log("filled2: ", filled2)
-            // points.set(filled2)
+            if (sampleInterval) {
+                clearInterval(sampleInterval);
+            }
+            updateAllPlayingNotes();
         },
     }
 }
