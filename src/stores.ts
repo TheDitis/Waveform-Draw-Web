@@ -91,13 +91,11 @@ const createWaveform = () => {
         let wav = _.unzip(get(points))[1];
         let max = Math.max(...wav);
         let min = Math.min(...wav);
-        let mid = (max - min) / 2;
-        console.log('max: ', max);
-        console.log('min: ', min);
-        console.log('mid: ', mid);
-        wav = wav.map((val) => {
-            return (val - mid) / mid;
-        })
+        let mid = (max + min) / 2;
+        wav = wav.map((val) => (val - (mid + min)) / mid) // center between -1 & 1
+        max = Math.max(...wav);
+        min = Math.min(...wav);
+        mid = (max + min) / 2;
         let buffer = audioCtx.createBuffer(2, wav.length, audioCtx.sampleRate);
         for (let chan = 0; chan < 2; chan++) {
             const channelBuffer = buffer.getChannelData(chan);
