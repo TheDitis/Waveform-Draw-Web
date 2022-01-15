@@ -5,6 +5,11 @@ import type {Note} from "./music";
 
 type Point = [number, number]
 
+// TODO: Center line on waveform drawing
+// TODO: Fix point over-deletion
+// TODO: Make notes actually play selected pitch
+// TODO: Play notes with keyboard
+
 const createWaveform = () => {
     const points: Writable<Point[]> = writable([[0, 0], [0, 0]]);
     const lastUpdatedIndex: Writable<number> = writable(0);
@@ -26,29 +31,46 @@ const createWaveform = () => {
             let insertionIndex: number = points.findIndex(greaterOrEqualX);
             insertionIndex = insertionIndex >= 0 ? insertionIndex : points.length - 1;
             let deleteCount: number = 0;
-            let unzipped: number[][] = _.unzip(points);
-            let index = unzipped[0].indexOf(pt[0]);
+            let unzipped: number[][] = _.unzip(points); // 2 arrays, one of all x coords & one of all y coords
+            const lastIndex = get(lastUpdatedIndex);
+            let diff: number = insertionIndex - lastIndex; // difference between the clicked index and the lastUpdated index
+            // see if there is a point already at that x coordinate, add it to delete count
+            let index = unzipped[0].indexOf(pt[0]); // index
             if (index >= 0) {
                 deleteCount += 1;
             }
 
+            console.log('\n');
+
+
             // REMOVE SKIPPED POINTS
             if (get(isDrawing)) {
-                const lastIndex = get(lastUpdatedIndex);
-                let diff: number = insertionIndex - lastIndex;
+                console.log('diff: ', diff);
                 // if any items were skipped:
                 if (diff > 1 || diff <= -1) {
-                    insertionIndex = points[insertionIndex][0] < points[lastIndex][0] ? insertionIndex : lastIndex;
+                    // reassign insertionIndex to lastUpdatedIndex if insertionIndex.x >= lastIndex.x
+                    if (points[insertionIndex][0] >= points[lastIndex][0]) {
+                        console.log('assigning lastUpdatedIndex to lastIndex')
+                        insertionIndex = lastIndex;
+                    }
                     deleteCount += Math.abs(diff);
-                    if (points[insertionIndex][0] <= points[lastIndex][0] && insertionIndex < points.length - 5) {
+                    // if insertionIndex.x <= lastIndex.x and insertionIndex is not right at the right end
+                    if (points[insertionIndex][0] < points[lastIndex][0] && insertionIndex < points.length - 5 && diff < 0) {
+                        console.log('NOT adding 1 to delete count on 56')
                         deleteCount += 1;
                     }
-                    console.log("delete count: ", deleteCount)
                 }
+                console.log("final delete count: ", deleteCount);
+                console.log('lastIndexUpdated: ', lastIndex);
+                console.log('insertionIndex: ', insertionIndex);
+            }
+
+            if (diff < 0 && deleteCount) {
+                deleteCount -= 1;
             }
 
             points.splice(insertionIndex, deleteCount, pt);
-            lastUpdatedIndex.set(insertionIndex);
+            lastUpdatedIndex.set(points.indexOf(pt));
             points.sort((a, b) => a[0] - b[0]);
             return points;
         });
