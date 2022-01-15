@@ -46,6 +46,7 @@
         on:mouseup={onMouseUp}
         on:mousemove={onMove}
     >
+        <line x1={0} y1={h / 2} x2={w} y2={h / 2} stroke={'rgba(255, 255, 255, 0.4)'} stroke-width={2} />
         <WaveformLine/>
     </svg>
 </div>
@@ -61,5 +62,6 @@
     .canvas {
         width: 100%;
         height: 100%;
+        filter: blur(1px);
     }
 </style>

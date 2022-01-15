@@ -5,10 +5,10 @@ import type {Note} from "./music";
 
 type Point = [number, number]
 
-// TODO: Center line on waveform drawing
-// TODO: Fix point over-deletion
-// TODO: Make notes actually play selected pitch
-// TODO: Play notes with keyboard
+// TODO: [ ] Center line on waveform drawing
+// TODO: [x] Fix point over-deletion
+// TODO: [ ] Make notes actually play selected pitch
+// TODO: [ ] Play notes with keyboard
 
 const createWaveform = () => {
     const points: Writable<Point[]> = writable([[0, 0], [0, 0]]);

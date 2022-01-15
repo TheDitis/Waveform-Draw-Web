@@ -5,4 +5,4 @@
 </script>
 
 
-<path d={$path} stroke="yellow" stroke-width="5px" fill="none"/>
+<path d={$path} stroke="yellow" stroke-width={3} fill="none"/>
