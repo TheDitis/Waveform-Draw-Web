@@ -40,29 +40,20 @@ const createWaveform = () => {
                 deleteCount += 1;
             }
 
-            console.log('\n');
-
-
             // REMOVE SKIPPED POINTS
             if (get(isDrawing)) {
-                console.log('diff: ', diff);
                 // if any items were skipped:
                 if (diff > 1 || diff <= -1) {
                     // reassign insertionIndex to lastUpdatedIndex if insertionIndex.x >= lastIndex.x
                     if (points[insertionIndex][0] >= points[lastIndex][0]) {
-                        console.log('assigning lastUpdatedIndex to lastIndex')
                         insertionIndex = lastIndex;
                     }
                     deleteCount += Math.abs(diff);
                     // if insertionIndex.x <= lastIndex.x and insertionIndex is not right at the right end
                     if (points[insertionIndex][0] < points[lastIndex][0] && insertionIndex < points.length - 5 && diff < 0) {
-                        console.log('NOT adding 1 to delete count on 56')
                         deleteCount += 1;
                     }
                 }
-                console.log("final delete count: ", deleteCount);
-                console.log('lastIndexUpdated: ', lastIndex);
-                console.log('insertionIndex: ', insertionIndex);
             }
 
             if (diff < 0 && deleteCount) {
