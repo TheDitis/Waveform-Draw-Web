@@ -12,7 +12,8 @@ export type Point = [number, number]
 // TODO: [x] Fix point over-deletion (sort of)
 // TODO: [x] Fill in missing points (not specifically drawn) for output waveform
 // TODO: [x] Make notes actually play selected pitch
-// TODO: [ ] Play notes with keyboard
+// TODO: [x] Play notes with keyboard
+// TODO: [ ] Correct phase of output waveform
 
 const createWaveform = () => {
     const points: Writable<Point[]> = writable([[0, 0], [0, 0]]);
@@ -75,7 +76,7 @@ const createWaveform = () => {
         let max = Math.max(...wav);
         let min = Math.min(...wav);
         let mid = (max + min) / 2;
-        wav = wav.map((val) => (val - (mid + min)) / mid) // center between -1 & 1
+        wav = wav.map((val) => - (val - (mid + min)) / mid) // center between -1 & 1 (flipping phase too)
         max = Math.max(...wav);
         min = Math.min(...wav);
         mid = (max + min) / 2;

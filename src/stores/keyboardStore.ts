@@ -43,7 +43,7 @@ const createKeyboardStore = () => {
     const dimensions = totalDimensions(options).map(
         v => Math.round(v) + options.strokeWidth * 2
     );
-    const keyboardOctave: Writable<number> = writable(1);
+    const keyboardOctave: Writable<number> = writable(4);
     /** array of notes that are currently playing */
     const notesPlaying: Writable<NumberedNote[]> = writable([]);
     /** MAIN
