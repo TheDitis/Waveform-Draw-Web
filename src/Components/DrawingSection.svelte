@@ -1,7 +1,7 @@
 <script lang="ts">
     import {onMount} from "svelte";
     import WaveformLine from "./WaveformLine.svelte";
-    import {waveform} from "../stores";
+    import {waveform} from "../stores/waveformStore";
 
     let canvas;
     let h, w;
@@ -28,7 +28,7 @@
         }
     }
 
-    $: viewbox = h && w ? `0 0 ${canvas.clientWidth} ${canvas.clientHeight}` : null
+    $: viewbox = h && w && canvas ? `0 0 ${canvas.clientWidth} ${canvas.clientHeight}` : null
 
 </script>
 

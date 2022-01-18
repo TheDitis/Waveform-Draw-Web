@@ -1,10 +1,10 @@
 import {derived, get, Readable, writable, Writable} from "svelte/store";
 import _ from "lodash";
-import type {Note} from "./music";
-import {make_download} from "./utils/toWav";
-import {drawnPointsToWaveform} from "./utils/audioUtils";
-import {getNoteFrequency} from "./music";
-import type {NumberedNote} from "./music/music";
+import type {Note} from "../music";
+import {make_download} from "../utils/toWav";
+import {drawnPointsToWaveform} from "../utils/audioUtils";
+import {getNoteFrequency} from "../music";
+import type {NumberedNote} from "../music/music";
 
 export type Point = [number, number]
 

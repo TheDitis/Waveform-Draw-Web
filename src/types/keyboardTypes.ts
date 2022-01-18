@@ -1,4 +1,4 @@
-import type {Note} from "../music";
+import type {NumberedNote} from "../music/music";
 
 export interface BaseKey {
     contrast: string;
@@ -6,7 +6,7 @@ export interface BaseKey {
     index: number;
     lowerHeight: number;
     lowerWidth: number;
-    notes: Note[];
+    notes: NumberedNote[];
     offsetX: number;
     scaleX: number;
     stroke: string;

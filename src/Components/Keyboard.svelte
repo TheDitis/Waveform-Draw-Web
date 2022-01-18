@@ -1,51 +1,32 @@
 <script lang="ts">
     // @ts-ignore
     import {
-        renderKeys,
-        totalDimensions,
-        defaultOptions,
         getPoints
     } from 'svg-piano';
-    import {waveform} from "../stores";
-    import type {BaseKey, Key} from "../types/keyboardTypes";
-    import {addIsPlayingToAllKeys} from "../types/keyboardTypes";
+    import {waveform} from "../stores/waveformStore";
+    import {keyboardStore} from "../stores/keyboardStore";
+    import type {Key} from "../types/keyboardTypes";
 
-    export let options = {
-        scaleX: 2,
-        strokeWidth: 2
-    };
-    options = defaultOptions(options)
-    let keys: Key[] = addIsPlayingToAllKeys(renderKeys() as BaseKey[]);
-
-    const dimensions = totalDimensions(options).map(
-        v => Math.round(v) + options.strokeWidth * 2
-    );
-
-    function keyClicked(key, index) {
-        if (key.isPlaying) {
-            key.isPlaying = false;
-            waveform.stop(key.notes[0]);
-            key.fill = key.notes.length === 2  && key.notes[0].split('').includes('b') ? "#39383D" : "#F2F2EF";
-        } else {
-            key.isPlaying = true;
-            waveform.play(key.notes[0]);
-            key.fill = '#9973ff'
-            console.log('playing ', key);
-        }
-        keys.splice(index, key);
-        keys = keys;
+    const play = (key: Key) => {
+        keyboardStore.play(key.notes[0]);
+        waveform.play(key.notes[0]);
     }
+
+    const stop = (key: Key) => {
+        keyboardStore.stop(key.notes[0]);
+        waveform.stop(key.notes[0]);
+    }
+
 </script>
 
 <div class="Keyboard">
-    <a href="" id="download_link">DOWNLOAD</a>
     <svg
         style="margin:0"
-        width={dimensions[0]}
+        width={keyboardStore.dimensions[0]}
     >
-        {#each keys as key, index}
+        {#each $keyboardStore as key, index}
             <polygon
-                on:click={() => keyClicked(key, index)}
+                on:click={() => key.isPlaying ? stop(key) : play(key)}
                 points={
                     getPoints(key)
                         .map(p => p.join(','))
@@ -57,6 +38,8 @@
             />
         {/each}
     </svg>
+
+    <a href="" id="download_link">DOWNLOAD</a>
 </div>
 
 <style>

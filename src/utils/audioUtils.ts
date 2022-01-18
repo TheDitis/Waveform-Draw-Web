@@ -1,5 +1,5 @@
 import _ from "lodash";
-import type {Point} from "../stores";
+import type {Point} from "../stores/waveformStore";
 
 /** Fills in points to the waveform that weren't specifically drawn
  * Example: clicking once in the top left and once in the bottom right creates

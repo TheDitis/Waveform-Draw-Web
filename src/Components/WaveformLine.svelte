@@ -1,5 +1,5 @@
 <script>
-    import {waveform} from "../stores"
+    import {waveform} from "../stores/waveformStore"
 
     const path = waveform.svgPath
 </script>
