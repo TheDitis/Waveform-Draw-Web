@@ -1,7 +1,8 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import WaveformLine from "./WaveformLine.svelte";
-    import {waveformStore} from "../stores/waveformStore";
+    import WaveformLine from "../WaveformLine.svelte";
+    import {waveformStore} from "../../stores/waveformStore";
+    import WaveformGrid from "./WaveformGrid.svelte";
 
     let canvas;
     let h, w;
@@ -18,7 +19,7 @@
         waveformStore.startDraw();
     }
 
-    const onMouseUp = (e: MouseEvent) => {
+    const onMouseUp = (_: MouseEvent) => {
         waveformStore.endDraw();
     }
 
@@ -46,7 +47,7 @@
         on:mouseup={onMouseUp}
         on:mousemove={onMove}
     >
-        <line x1={0} y1={h / 2} x2={w} y2={h / 2} stroke={'rgba(255, 255, 255, 0.4)'} stroke-width={2} />
+        <WaveformGrid {w} {h}/>
         <WaveformLine/>
     </svg>
 </div>

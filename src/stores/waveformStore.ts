@@ -13,7 +13,7 @@ export type Point = [number, number]
 // TODO: [x] Make notes actually play selected pitch
 // TODO: [x] Play notes with keyboard
 // TODO: [x] Correct phase of output waveform
-// TODO: [ ] Add grid to drawing canvas
+// TODO: [x] Add grid to drawing canvas
 
 const createWaveform = () => {
     // Drawn points on the svg interface
