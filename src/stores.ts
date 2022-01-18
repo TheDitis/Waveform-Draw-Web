@@ -6,8 +6,9 @@ import {drawnPointsToWaveform} from "./utils/audioUtils";
 
 export type Point = [number, number]
 
-// TODO: [ ] Center line on waveform drawing
-// TODO: [x] Fix point over-deletion
+// TODO: [x] Center line on waveform drawing
+// TODO: [x] Fix point over-deletion (sort of)
+// TODO: [ ] Fill in missing points (not specifically drawn) for output waveform
 // TODO: [ ] Make notes actually play selected pitch
 // TODO: [ ] Play notes with keyboard
 
