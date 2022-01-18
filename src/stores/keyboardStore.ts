@@ -27,7 +27,7 @@ options = defaultOptions(options)
  *      play: (note: NumberedNote) => void,
  *      isPlaying: (note: NumberedNote) => boolean,
  *      stop: (note: NumberedNote) => void,
- *      subscribe: (this:void, run: Subscriber<Key[]>, invalidate?: Invalidator<Key[]>) => Unsubscriber,
+ *      subscribe: Readable.subscribe,
  *      keys: Readable<BaseKey[]>,
  *      toggleNote: (note: NumberedNote) => void,
  *      svgPoints: (key: (BaseKey | Key)) => string, dimensions: any,

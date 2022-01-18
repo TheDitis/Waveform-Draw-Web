@@ -1,9 +1,8 @@
 import {derived, get, Readable, writable, Writable} from "svelte/store";
 import _ from "lodash";
-import type {Note} from "../music";
+import {getNoteFrequency} from "../music";
 import {make_download} from "../utils/toWav";
 import {drawnPointsToWaveform} from "../utils/audioUtils";
-import {getNoteFrequency} from "../music";
 import type {NumberedNote} from "../music/music";
 
 export type Point = [number, number]
@@ -13,22 +12,31 @@ export type Point = [number, number]
 // TODO: [x] Fill in missing points (not specifically drawn) for output waveform
 // TODO: [x] Make notes actually play selected pitch
 // TODO: [x] Play notes with keyboard
-// TODO: [ ] Correct phase of output waveform
+// TODO: [x] Correct phase of output waveform
+// TODO: [ ] Add grid to drawing canvas
 
 const createWaveform = () => {
+    // Drawn points on the svg interface
     const points: Writable<Point[]> = writable([[0, 0], [0, 0]]);
+    // Index of the last point in points updated in the middle of a draw
     const lastUpdatedIndex: Writable<number> = writable(0);
+    // Whether the mouse is down and being dragged over the svg canvas
     const isDrawing: Writable<boolean> = writable(false);
+    // SVG path representing the waveform
     const svgPath: Readable<string> = derived(points, ($points) => (
         `M ${_.flattenDeep($points).join(" ")}`
     ))
-    type AudioNodesObject = Partial<{ [key in Note]: AudioBufferSourceNode }>;
+    type AudioNodesObject = Partial<{ [key in NumberedNote]: AudioBufferSourceNode }>;
+    // Object of actively playing audio nodes by note
     const audioNodes: Writable<AudioNodesObject> = writable({});
 
     let sampleInterval;  // used to update node audio while you draw
 
     const audioCtx = new window.AudioContext();
 
+    /** Add a new point to points (called when drawing line)
+     * @param {Point} pt - new point to add
+     */
     const addPoint = (pt: Point) => {
         /// ADD A POINT TO THE WAVEFORM REPRESENTATION
         const greaterOrEqualX = (pt2: Point): boolean => pt2[0] >= pt[0];
@@ -72,6 +80,10 @@ const createWaveform = () => {
         });
     }
 
+    /** Turns raw audio data into and AudioBuffer object (also sets download link)
+     * @param {number[]} wav - array of raw audio data
+     * @returns {AudioBuffer} - buffer to be used with web-audio API
+     */
     const waveformToAudioBuffer = (wav: number[]): AudioBuffer => {
         let max = Math.max(...wav);
         let min = Math.min(...wav);
@@ -91,11 +103,31 @@ const createWaveform = () => {
         return buffer;
     }
 
-    const play = (note) => {
+    /** Start playing the waveform at the pitch of the given note
+     * @param {NumberedNote} note - note to play frequency of
+     */
+    const play = (note: NumberedNote) => {
         const audioNode = newAudioNode(note);
         audioNodes.update((current) => ({...current, [note]: audioNode}));
     }
 
+    /** Stop playing the given note if it is playing
+     * @param {NumberedNote} note - note to stop playing
+     */
+    const stop = (note: NumberedNote) => {
+        if (note in get(audioNodes)) {
+            audioNodes.update((current) => {
+                current[note].stop();
+                delete current[note];
+                return current;
+            });
+        }
+    }
+
+    /** Create & start a new audio node playing the current waveform
+     * @param {NumberedNote} note - note to play the frequency of
+     * @returns {AudioBufferSourceNode} - node loaded with pitched data and started
+     */
     const newAudioNode = (note: NumberedNote) => {
         const audioNode = audioCtx.createBufferSource();
         audioNode.buffer = waveformToAudioBuffer(
@@ -109,6 +141,7 @@ const createWaveform = () => {
         return audioNode;
     }
 
+    /** Refresh all playing audio nodes */
     const updateAllPlayingNotes = () => {
         audioNodes.update((nodes) => {
             Object.entries(get(audioNodes)).forEach(([note, node]) => {
@@ -121,37 +154,35 @@ const createWaveform = () => {
         })
     }
 
+    /** Mark the start of a drawing session (click & drag) */
+    const startDraw = () => {
+        isDrawing.set(true);
+        if (Object.keys(get(audioNodes)).length) {
+            sampleInterval = setInterval(updateAllPlayingNotes, 200);
+        }
+    }
+
+    /** Mark that you are done drawing (click & drag) */
+    const endDraw = () => {
+        isDrawing.set(false);
+        if (sampleInterval) {
+            clearInterval(sampleInterval);
+        }
+        updateAllPlayingNotes();
+    }
+
     return {
         subscribe: points.subscribe,
         set: points.set,
         addPoint,
         play,
-        stop: (note) => {
-            if (note in get(audioNodes)) {
-                audioNodes.update((current) => {
-                    current[note].stop();
-                    delete current[note];
-                    return current;
-                });
-            }
-        },
+        stop,
         svgPath,
         get isDrawing(): boolean {
             return get(isDrawing)
         },
-        startDraw: () => {
-            isDrawing.set(true);
-            if (Object.keys(get(audioNodes)).length) {
-                sampleInterval = setInterval(updateAllPlayingNotes, 200);
-            }
-        },
-        endDraw: () => {
-            isDrawing.set(false);
-            if (sampleInterval) {
-                clearInterval(sampleInterval);
-            }
-            updateAllPlayingNotes();
-        },
+        startDraw,
+        endDraw,
     }
 }
 
