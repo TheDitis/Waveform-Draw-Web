@@ -8,7 +8,7 @@ export type Point = [number, number]
 
 // TODO: [x] Center line on waveform drawing
 // TODO: [x] Fix point over-deletion (sort of)
-// TODO: [ ] Fill in missing points (not specifically drawn) for output waveform
+// TODO: [x] Fill in missing points (not specifically drawn) for output waveform
 // TODO: [ ] Make notes actually play selected pitch
 // TODO: [ ] Play notes with keyboard
 
@@ -22,7 +22,7 @@ const createWaveform = () => {
     type AudioNodesObject = Partial<{ [key in Note]: AudioBufferSourceNode }>;
     const audioNodes: Writable<AudioNodesObject> = writable({});
 
-    let sampleInterval;
+    let sampleInterval;  // used to update node audio while you draw
 
     const audioCtx = new window.AudioContext();
 
@@ -69,7 +69,6 @@ const createWaveform = () => {
         });
     }
 
-
     const pointsToAudioBuffer = (wav: number[]): AudioBuffer => {
         let max = Math.max(...wav);
         let min = Math.min(...wav);
@@ -115,9 +114,7 @@ const createWaveform = () => {
             })
             return nodes;
         })
-
     }
-
 
     return {
         subscribe: points.subscribe,

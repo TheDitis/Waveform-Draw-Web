@@ -17,8 +17,6 @@
     options = defaultOptions(options)
     let keys: Key[] = addIsPlayingToAllKeys(renderKeys() as BaseKey[]);
 
-    console.log('keys: ', keys)
-
     const dimensions = totalDimensions(options).map(
         v => Math.round(v) + options.strokeWidth * 2
     );
