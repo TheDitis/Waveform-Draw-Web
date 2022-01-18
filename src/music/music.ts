@@ -1,5 +1,3 @@
-import type {BaseNote, NextNoteDown, NextNoteUp} from "./utilityTypes";
-
 export const octaveKeys = [...Array(12).keys()];
 export const whiteKeys = [0, 2, 4, 5, 7, 9, 11] as const;
 export const blackKeys = [1, 3, 6, 8, 10] as const;
@@ -48,13 +46,14 @@ export type WhiteNote = typeof whiteNotes[number];
 export type AlteredNote<Mod extends NoteModifier, N extends WhiteNote = WhiteNote> = `${N}${Mod}`;
 export type FlatNote = AlteredNote<FlatModifier>; // `${WhiteNote}${FlatModifier}`;
 export type SharpNote = AlteredNote<SharpModifier>; // `${WhiteNote}${SharpModifier}`;
-// export type FlatNote = typeof flatNotes[number];
-// export type SharpNote = typeof sharpNotes[number];
 export type BlackNote = FlatNote | SharpNote;
 export type Note = BlackNote | WhiteNote;
-export type NumberedNote<N extends WhiteNote, Oct extends OctaveNumber, M extends NoteModifier = ''> = `${N}${M}${Oct}`;
-let g0: NumberedNote<'G', 0> = 'G0'
-//: { [N in FlatNote]: SharpCounterpart<N> }
+export type NumberedNote<
+    N extends WhiteNote = WhiteNote,
+    Oct extends OctaveNumber = OctaveNumber,
+    M extends NoteModifier = ''
+> = `${N}${M}${Oct}`;
+
 export const flatSharpMap = {
     'Cb': 'B', 'Db': 'C#', 'Eb': 'D#', 'Fb': 'E', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#'
 } as const;
@@ -67,17 +66,12 @@ type SharpsToFlats = typeof sharpFlatMap;
 export type SharpCounterpart<N extends FlatNote> = FlatsToSharps[N];
 export type FlatCounterpart<N extends SharpNote> = SharpsToFlats[N]
 
-
-// export type SharpCounterpart<Flat extends FlatNote> = `${NextNoteDown<BaseNote<Flat>>}${SharpModifier}`
-// export type FlatCounterpart<Sharp extends SharpNote> = `${NextNoteUp<BaseNote<Sharp>>}${FlatModifier}`
-
-
 export const notes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
 // type Octave = ['C', 'C#' | 'Db', 'D', 'D#' | 'Eb', 'E', 'F', 'F#' | 'Gb', 'G', 'G#' | 'Ab', 'A', 'A#' | 'Bb', 'B']
 // const octaveWithSharps: Octave = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 // const octaveWithFlats: Octave = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-//
+
 export const allNotes = [
     'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'
 ];

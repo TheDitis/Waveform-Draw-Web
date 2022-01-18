@@ -3,13 +3,15 @@ import _ from "lodash";
 import type {Note} from "./music";
 import {make_download} from "./utils/toWav";
 import {drawnPointsToWaveform} from "./utils/audioUtils";
+import {getNoteFrequency} from "./music";
+import type {NumberedNote} from "./music/music";
 
 export type Point = [number, number]
 
 // TODO: [x] Center line on waveform drawing
 // TODO: [x] Fix point over-deletion (sort of)
 // TODO: [x] Fill in missing points (not specifically drawn) for output waveform
-// TODO: [ ] Make notes actually play selected pitch
+// TODO: [x] Make notes actually play selected pitch
 // TODO: [ ] Play notes with keyboard
 
 const createWaveform = () => {
@@ -93,10 +95,12 @@ const createWaveform = () => {
         audioNodes.update((current) => ({...current, [note]: audioNode}));
     }
 
-    const newAudioNode = (note) => {
+    const newAudioNode = (note: NumberedNote) => {
         const audioNode = audioCtx.createBufferSource();
         audioNode.buffer = waveformToAudioBuffer(
-            drawnPointsToWaveform(get(points))
+            drawnPointsToWaveform(
+                get(points),
+                Math.floor(audioCtx.sampleRate / getNoteFrequency(note))),
         )
         audioNode.loop = true;
         audioNode.connect(audioCtx.destination);
@@ -110,7 +114,7 @@ const createWaveform = () => {
                 node.stop();
                 node.disconnect(audioCtx.destination);
                 delete nodes[note];
-                nodes[note] = newAudioNode(note);
+                nodes[note] = newAudioNode(note as NumberedNote);
             })
             return nodes;
         })

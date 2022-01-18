@@ -1,4 +1,3 @@
-import {NUM_SAMPLES} from "../const";
 import _ from "lodash";
 import type {Point} from "../stores";
 
@@ -8,14 +7,14 @@ import type {Point} from "../stores";
  * starting & ending 0s). This will add samples in-between for each x value
  * to make it a valid waveform
  * @param {Point[]} pts - array of drawn points
+ * @param {number} nSamplesOut - number of samples in the resulting waveform
  * @returns {number[]} - newly generated waveform
  */
-export const drawnPointsToWaveform = (pts: Point[]): number[] => {
+export const drawnPointsToWaveform = (pts: Point[], nSamplesOut: number): number[] => {
     // Make an empty array the size of the desired output file
-    let wav = Array(NUM_SAMPLES).fill(0);
+    let wav = Array(nSamplesOut).fill(0);
     const [xs, ys] = _.unzip(pts);
     const nSamplesIn = xs[xs.length - 1];
-    const nSamplesOut = NUM_SAMPLES;
 
     // indices of points, one for the point at x below xPos, and one for the x above
     let loInd = 0;
