@@ -1,7 +1,7 @@
 <script lang="ts">
     import {onMount} from "svelte";
     import WaveformLine from "./WaveformLine.svelte";
-    import {waveform} from "../stores/waveformStore";
+    import {waveformStore} from "../stores/waveformStore";
 
     let canvas;
     let h, w;
@@ -9,22 +9,22 @@
     onMount(() => {
         if (canvas) {
             const midpoint = Math.round(canvas.clientHeight / 2)
-            waveform.set([[0, midpoint], [canvas.clientWidth, midpoint]])
+            waveformStore.set([[0, midpoint], [canvas.clientWidth, midpoint]])
         }
     })
 
     const onMouseDown = (e: MouseEvent) => {
-        waveform.addPoint([e.offsetX, e.offsetY]);
-        waveform.startDraw();
+        waveformStore.addPoint([e.offsetX, e.offsetY]);
+        waveformStore.startDraw();
     }
 
     const onMouseUp = (e: MouseEvent) => {
-        waveform.endDraw();
+        waveformStore.endDraw();
     }
 
     const onMove = (e: MouseEvent) => {
-        if (waveform.isDrawing) {
-            waveform.addPoint([e.offsetX, e.offsetY])
+        if (waveformStore.isDrawing) {
+            waveformStore.addPoint([e.offsetX, e.offsetY])
         }
     }
 

@@ -155,4 +155,4 @@ const createWaveform = () => {
 }
 
 
-export const waveform = createWaveform();
+export const waveformStore = createWaveform();

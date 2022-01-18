@@ -1,22 +1,5 @@
 <script lang="ts">
-    // @ts-ignore
-    import {
-        getPoints
-    } from 'svg-piano';
-    import {waveform} from "../stores/waveformStore";
     import {keyboardStore} from "../stores/keyboardStore";
-    import type {Key} from "../types/keyboardTypes";
-
-    const play = (key: Key) => {
-        keyboardStore.play(key.notes[0]);
-        waveform.play(key.notes[0]);
-    }
-
-    const stop = (key: Key) => {
-        keyboardStore.stop(key.notes[0]);
-        waveform.stop(key.notes[0]);
-    }
-
 </script>
 
 <div class="Keyboard">
@@ -26,12 +9,8 @@
     >
         {#each $keyboardStore as key, index}
             <polygon
-                on:click={() => key.isPlaying ? stop(key) : play(key)}
-                points={
-                    getPoints(key)
-                        .map(p => p.join(','))
-                        .join(' ')
-                }
+                on:click={() => keyboardStore.toggleNote(key.notes[0])}
+                points={keyboardStore.svgPoints(key)}
                 fill={key.fill}
                 stroke={key.stroke}
                 stroke-width={key.strokeWidth}
