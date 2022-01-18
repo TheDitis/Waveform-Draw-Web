@@ -1,10 +1,4 @@
 export function make_download(abuffer, total_samples) {
-
-    // get duration and sample rate
-    let duration = abuffer.duration
-    let rate = abuffer.sampleRate
-    let offset = 0
-
     let new_file = URL.createObjectURL(bufferToWave(abuffer, total_samples));
     let download_link: HTMLAnchorElement = document.getElementById("download_link") as HTMLAnchorElement;
     download_link.href = new_file;

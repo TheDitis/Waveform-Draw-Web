@@ -69,7 +69,7 @@ const createWaveform = () => {
         });
     }
 
-    const pointsToAudioBuffer = (wav: number[]): AudioBuffer => {
+    const waveformToAudioBuffer = (wav: number[]): AudioBuffer => {
         let max = Math.max(...wav);
         let min = Math.min(...wav);
         let mid = (max + min) / 2;
@@ -77,8 +77,8 @@ const createWaveform = () => {
         max = Math.max(...wav);
         min = Math.min(...wav);
         mid = (max + min) / 2;
-        let buffer = audioCtx.createBuffer(2, wav.length, audioCtx.sampleRate);
-        for (let chan = 0; chan < 2; chan++) {
+        let buffer = audioCtx.createBuffer(1, wav.length, audioCtx.sampleRate);
+        for (let chan = 0; chan < 1; chan++) {
             const channelBuffer = buffer.getChannelData(chan);
             for (let i = 0; i < buffer.length; i++) {
                 channelBuffer[i] = wav[i];
@@ -95,7 +95,7 @@ const createWaveform = () => {
 
     const newAudioNode = (note) => {
         const audioNode = audioCtx.createBufferSource();
-        audioNode.buffer = pointsToAudioBuffer(
+        audioNode.buffer = waveformToAudioBuffer(
             drawnPointsToWaveform(get(points))
         )
         audioNode.loop = true;
