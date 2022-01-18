@@ -29,8 +29,11 @@ options = defaultOptions(options)
  *      stop: (note: NumberedNote) => void,
  *      subscribe: (this:void, run: Subscriber<Key[]>, invalidate?: Invalidator<Key[]>) => Unsubscriber,
  *      keys: Readable<BaseKey[]>,
- *      toggleNote: (note) => void,
- *      svgPoints: (key: (BaseKey | Key)) => string, dimensions: any
+ *      toggleNote: (note: NumberedNote) => void,
+ *      svgPoints: (key: (BaseKey | Key)) => string, dimensions: any,
+ *      getOctave: () => number,
+ *      octaveUp: () => void,
+ *      octaveDown: () => void,
  *  }}
  */
 const createKeyboardStore = () => {
@@ -40,6 +43,7 @@ const createKeyboardStore = () => {
     const dimensions = totalDimensions(options).map(
         v => Math.round(v) + options.strokeWidth * 2
     );
+    const keyboardOctave: Writable<number> = writable(1);
     /** array of notes that are currently playing */
     const notesPlaying: Writable<NumberedNote[]> = writable([]);
     /** MAIN
@@ -49,7 +53,7 @@ const createKeyboardStore = () => {
     const keyboard: Readable<Key[]> = derived(
         [keys, notesPlaying],
         ([$keys, $notesPlaying]) => $keys.map((key) => {
-            const isPlaying = $notesPlaying.includes(key.notes[0])
+            const isPlaying = $notesPlaying.includes(key.notes[0]);
             return {
                 ...key,
                 isPlaying,
@@ -91,7 +95,7 @@ const createKeyboardStore = () => {
     /** Toggle the playing-status of a note (play if stopped, stop if playing)
      * @param note - note to play or stop
      */
-    const toggleNote = (note) => {
+    const toggleNote = (note: NumberedNote) => {
         if (isPlaying(note)) {
             stop(note);
         } else {
@@ -109,6 +113,11 @@ const createKeyboardStore = () => {
             .join(' ')
     );
 
+    /** Increase the octave the computer plays by 1 */
+    const octaveUp = () => keyboardOctave.update((oct) => Math.min(oct + 1, 8));
+    /** Decrease the octave the computer plays by 1 */
+    const octaveDown = () => keyboardOctave.update((oct) => Math.max(oct - 1, 0));
+
     return {
         subscribe: keyboard.subscribe,
         keys,
@@ -118,6 +127,9 @@ const createKeyboardStore = () => {
         dimensions,
         toggleNote,
         svgPoints,
+        getOctave: () => get(keyboardOctave),
+        octaveUp,
+        octaveDown,
     }
 }
 
