@@ -47,8 +47,10 @@
         on:mouseup={onMouseUp}
         on:mousemove={onMove}
     >
-        <WaveformGrid {w} {h}/>
-        <WaveformLine/>
+        {#if w && h}
+            <WaveformGrid {w} {h}/>
+            <WaveformLine/>
+        {/if}
     </svg>
 </div>
 
