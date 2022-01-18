@@ -1,9 +1,10 @@
-import {readable, writable, derived, get, Readable, Writable} from "svelte/store";
-import {tick} from "svelte";
+import {derived, get, Readable, writable, Writable} from "svelte/store";
 import _ from "lodash";
 import type {Note} from "./music";
+import {make_download} from "./utils/toWav";
+import {drawnPointsToWaveform} from "./utils/audioUtils";
 
-type Point = [number, number]
+export type Point = [number, number]
 
 // TODO: [ ] Center line on waveform drawing
 // TODO: [x] Fix point over-deletion
@@ -67,38 +68,8 @@ const createWaveform = () => {
         });
     }
 
-    // // TODO: Finish this. Filling in waveform data in between drawn points
-    // const calcAllPoints = (): number[] => {
-    //     const unzipped = _.unzip(get(points));
-    //     const xs = unzipped[0];
-    //     const ys = unzipped[1];
-    //     const output: number[] = [];
-    //     for (let i of xs) {
-    //         if (i < unzipped[0].length - 1) {
-    //             console.log("inside!")
-    //             const x: number = xs[i];
-    //             const y: number = ys[i];
-    //             const x_next: number = xs[i + 1];
-    //             const y_next: number = ys[i + 1];
-    //             output.push(y);
-    //             // Get the space between points in the x
-    //             const x_diff = x_next - x;
-    //             if (x_diff > 1) {
-    //                 const y_diff = y - y_next;
-    //                 const increment = y_diff / x_diff;
-    //                 for (let j = 1; j < x_diff; j++) {
-    //                     output.push(y + (increment * (j + 1)))
-    //                 }
-    //             }
-    //             output.push(y_next);
-    //         }
-    //     }
-    //     return output
-    // }
 
-
-    const pointsToAudioBuffer = (): AudioBuffer => {
-        let wav = _.unzip(get(points))[1];
+    const pointsToAudioBuffer = (wav: number[]): AudioBuffer => {
         let max = Math.max(...wav);
         let min = Math.min(...wav);
         let mid = (max + min) / 2;
@@ -113,21 +84,20 @@ const createWaveform = () => {
                 channelBuffer[i] = wav[i];
             }
         }
+        make_download(buffer, buffer.length);
         return buffer;
     }
 
     const play = (note) => {
-        const audioNode = audioCtx.createBufferSource();
-        audioNode.buffer = pointsToAudioBuffer()
-        audioNode.loop = true;
-        audioNode.connect(audioCtx.destination);
-        audioNode.start();
-        audioNodes.update((current) => ({...current, [note]: audioNode}))
+        const audioNode = newAudioNode(note);
+        audioNodes.update((current) => ({...current, [note]: audioNode}));
     }
 
-    const updateExistingNode = (note) => {
+    const newAudioNode = (note) => {
         const audioNode = audioCtx.createBufferSource();
-        audioNode.buffer = pointsToAudioBuffer()
+        audioNode.buffer = pointsToAudioBuffer(
+            drawnPointsToWaveform(get(points))
+        )
         audioNode.loop = true;
         audioNode.connect(audioCtx.destination);
         audioNode.start();
@@ -140,20 +110,18 @@ const createWaveform = () => {
                 node.stop();
                 node.disconnect(audioCtx.destination);
                 delete nodes[note];
-                nodes[note] = updateExistingNode(note);
+                nodes[note] = newAudioNode(note);
             })
             return nodes;
         })
 
     }
 
-    const calcAllPoints = (): number[] => [1, 2, 3]
 
     return {
         subscribe: points.subscribe,
         set: points.set,
         addPoint,
-        fill: calcAllPoints,
         play,
         stop: (note) => {
             if (note in get(audioNodes)) {

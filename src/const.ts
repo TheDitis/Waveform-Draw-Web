@@ -1,0 +1,1 @@
+export const NUM_SAMPLES = Math.floor(256);

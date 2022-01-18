@@ -31,7 +31,7 @@
         } else {
             key.isPlaying = true;
             waveform.play(key.notes[0]);
-            key.fill = 'purple'
+            key.fill = '#9973ff'
             console.log('playing ', key);
         }
         keys.splice(index, key);
@@ -40,6 +40,7 @@
 </script>
 
 <div class="Keyboard">
+    <a href="" id="download_link">DOWNLOAD</a>
     <svg
         style="margin:0"
         width={dimensions[0]}
