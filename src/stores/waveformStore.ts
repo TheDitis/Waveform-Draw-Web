@@ -109,6 +109,7 @@ const createWaveform = () => {
      * @param {number} numNodes - number of playing audio nodes
      */
     const updateVolume = (numNodes: number) => {
+        numNodes = Math.max(numNodes, 1);
         mainGainNode.gain.value = 0.75 / (numNodes ** 0.6);
     }
 
@@ -121,7 +122,6 @@ const createWaveform = () => {
             updateVolume(Object.keys(current).length + 1);
             return ({...current, [note]: audioNode})
         });
-        // mainGainNode.gain.value = 1 / Math.log(Object.keys(get(audioNodes)).length);
     }
 
     /** Stop playing the given note if it is playing
@@ -130,6 +130,7 @@ const createWaveform = () => {
     const stop = (note: NumberedNote) => {
         if (note in get(audioNodes)) {
             audioNodes.update((current) => {
+                updateVolume(Object.keys(current).length - 1);
                 current[note].stop();
                 delete current[note];
                 return current;
