@@ -33,6 +33,8 @@ const createWaveform = () => {
     let sampleInterval;  // used to update node audio while you draw
 
     const audioCtx = new window.AudioContext();
+    const mainGainNode = audioCtx.createGain();
+    mainGainNode.connect(audioCtx.destination);
 
     /** Add a new point to points (called when drawing line)
      * @param {Point} pt - new point to add
@@ -103,12 +105,23 @@ const createWaveform = () => {
         return buffer;
     }
 
+    /** Adjust the output gain based on the number of nodes to avoid clipping
+     * @param {number} numNodes - number of playing audio nodes
+     */
+    const updateVolume = (numNodes: number) => {
+        mainGainNode.gain.value = 0.75 / (numNodes ** 0.6);
+    }
+
     /** Start playing the waveform at the pitch of the given note
      * @param {NumberedNote} note - note to play frequency of
      */
     const play = (note: NumberedNote) => {
         const audioNode = newAudioNode(note);
-        audioNodes.update((current) => ({...current, [note]: audioNode}));
+        audioNodes.update((current) => {
+            updateVolume(Object.keys(current).length + 1);
+            return ({...current, [note]: audioNode})
+        });
+        // mainGainNode.gain.value = 1 / Math.log(Object.keys(get(audioNodes)).length);
     }
 
     /** Stop playing the given note if it is playing
@@ -136,7 +149,7 @@ const createWaveform = () => {
                 Math.floor(audioCtx.sampleRate / getNoteFrequency(note))),
         )
         audioNode.loop = true;
-        audioNode.connect(audioCtx.destination);
+        audioNode.connect(mainGainNode);
         audioNode.start();
         return audioNode;
     }
@@ -146,7 +159,7 @@ const createWaveform = () => {
         audioNodes.update((nodes) => {
             Object.entries(get(audioNodes)).forEach(([note, node]) => {
                 node.stop();
-                node.disconnect(audioCtx.destination);
+                node.disconnect(mainGainNode);
                 delete nodes[note];
                 nodes[note] = newAudioNode(note as NumberedNote);
             })
