@@ -1,8 +1,6 @@
 import {derived, get, Readable, writable, Writable} from "svelte/store";
 import _ from "lodash";
-import {getNoteFrequency} from "../music";
-import {make_download} from "../utils/toWav";
-import {drawnPointsToWaveform} from "../utils/audioUtils";
+import {drawnWaveformToAudioBuffer} from "../utils/audioUtils";
 import type {NumberedNote} from "../music/music";
 
 export type Point = [number, number]
@@ -15,6 +13,37 @@ export type Point = [number, number]
 // TODO: [x] Correct phase of output waveform
 // TODO: [x] Add grid to drawing canvas
 
+const audioCtx = new window.AudioContext();
+const mainGainNode = audioCtx.createGain();
+mainGainNode.connect(audioCtx.destination);
+
+class WaveformOscillatorNode {
+    node: AudioBufferSourceNode;
+    gain: GainNode;
+    note: NumberedNote;
+
+    constructor(buffer: AudioBuffer, note: NumberedNote, start: boolean = true) {
+        this.note = note;
+        this.gain = audioCtx.createGain();
+        this.gain.connect(mainGainNode);
+        this.node = audioCtx.createBufferSource();
+        this.node.connect(this.gain);
+        this.node.buffer = buffer;
+        this.node.loop = true;
+        if (start) {
+            this.node.start();
+        }
+    }
+
+    stop() {
+        this.node.stop();
+    }
+
+    disconnect(node: AudioNode) {
+        this.gain.disconnect(node);
+    }
+}
+
 const createWaveform = () => {
     // Drawn points on the svg interface
     const points: Writable<Point[]> = writable([[0, 0], [0, 0]]);
@@ -26,15 +55,11 @@ const createWaveform = () => {
     const svgPath: Readable<string> = derived(points, ($points) => (
         `M ${_.flattenDeep($points).join(" ")}`
     ))
-    type AudioNodesObject = Partial<{ [key in NumberedNote]: AudioBufferSourceNode }>;
+    type AudioNodesObject = Partial<{ [key in NumberedNote]: WaveformOscillatorNode }>;
     // Object of actively playing audio nodes by note
     const audioNodes: Writable<AudioNodesObject> = writable({});
 
     let sampleInterval;  // used to update node audio while you draw
-
-    const audioCtx = new window.AudioContext();
-    const mainGainNode = audioCtx.createGain();
-    mainGainNode.connect(audioCtx.destination);
 
     /** Add a new point to points (called when drawing line)
      * @param {Point} pt - new point to add
@@ -82,42 +107,29 @@ const createWaveform = () => {
         });
     }
 
-    /** Turns raw audio data into and AudioBuffer object (also sets download link)
-     * @param {number[]} wav - array of raw audio data
-     * @returns {AudioBuffer} - buffer to be used with web-audio API
-     */
-    const waveformToAudioBuffer = (wav: number[]): AudioBuffer => {
-        let max = Math.max(...wav);
-        let min = Math.min(...wav);
-        let mid = (max + min) / 2;
-        wav = wav.map((val) => - (val - (mid + min)) / mid) // center between -1 & 1 (flipping phase too)
-        max = Math.max(...wav);
-        min = Math.min(...wav);
-        mid = (max + min) / 2;
-        let buffer = audioCtx.createBuffer(1, wav.length, audioCtx.sampleRate);
-        for (let chan = 0; chan < 1; chan++) {
-            const channelBuffer = buffer.getChannelData(chan);
-            for (let i = 0; i < buffer.length; i++) {
-                channelBuffer[i] = wav[i];
-            }
-        }
-        make_download(buffer, buffer.length);
-        return buffer;
-    }
-
     /** Adjust the output gain based on the number of nodes to avoid clipping
      * @param {number} numNodes - number of playing audio nodes
      */
     const updateVolume = (numNodes: number) => {
-        numNodes = Math.max(numNodes, 1);
-        mainGainNode.gain.value = 0.75 / (numNodes ** 0.6);
+        if (numNodes === 0) {
+            console.log(numNodes);
+            mainGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+        }
+        else if (numNodes === 1) {
+            mainGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            mainGainNode.gain.linearRampToValueAtTime(0.75, audioCtx.currentTime + 0.01);
+        } else {
+            numNodes = Math.max(numNodes, 1);
+            mainGainNode.gain.value = 0.75 / (numNodes ** 0.6);
+        }
     }
 
     /** Start playing the waveform at the pitch of the given note
      * @param {NumberedNote} note - note to play frequency of
      */
     const play = (note: NumberedNote) => {
-        const audioNode = newAudioNode(note);
+        const buffer = drawnWaveformToAudioBuffer(note, get(points));
+        const audioNode = new WaveformOscillatorNode(buffer, note);
         audioNodes.update((current) => {
             updateVolume(Object.keys(current).length + 1);
             return ({...current, [note]: audioNode})
@@ -138,23 +150,6 @@ const createWaveform = () => {
         }
     }
 
-    /** Create & start a new audio node playing the current waveform
-     * @param {NumberedNote} note - note to play the frequency of
-     * @returns {AudioBufferSourceNode} - node loaded with pitched data and started
-     */
-    const newAudioNode = (note: NumberedNote) => {
-        const audioNode = audioCtx.createBufferSource();
-        audioNode.buffer = waveformToAudioBuffer(
-            drawnPointsToWaveform(
-                get(points),
-                Math.floor(audioCtx.sampleRate / getNoteFrequency(note))),
-        )
-        audioNode.loop = true;
-        audioNode.connect(mainGainNode);
-        audioNode.start();
-        return audioNode;
-    }
-
     /** Refresh all playing audio nodes */
     const updateAllPlayingNotes = () => {
         audioNodes.update((nodes) => {
@@ -162,7 +157,8 @@ const createWaveform = () => {
                 node.stop();
                 node.disconnect(mainGainNode);
                 delete nodes[note];
-                nodes[note] = newAudioNode(note as NumberedNote);
+                const buffer = drawnWaveformToAudioBuffer(note as NumberedNote, get(points));
+                nodes[note] = new WaveformOscillatorNode(buffer, note as NumberedNote);
             })
             return nodes;
         })
