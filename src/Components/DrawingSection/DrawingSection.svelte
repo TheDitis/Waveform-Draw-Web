@@ -49,7 +49,7 @@
     >
         {#if w && h}
             <WaveformGrid {w} {h}/>
-            <WaveformLine/>
+            <WaveformLine />
         {/if}
     </svg>
 </div>
@@ -59,7 +59,7 @@
     .DrawingSection {
         width: 100vw;
         height: 70vh;
-        border: 5px solid var(--color);
+        border: 2px solid var(--color);
         box-sizing: border-box;
     }
     .canvas {
