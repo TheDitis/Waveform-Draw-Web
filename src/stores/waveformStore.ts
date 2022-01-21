@@ -1,9 +1,11 @@
-import {derived, get, Readable, writable, Writable} from "svelte/store";
+import { derived, get, writable } from "svelte/store";
 import _ from "lodash";
 import {drawnWaveformToAudioBuffer} from "../utils/audioUtils";
 import type {NumberedNote} from "../music/music";
+import type {AudioNodesObject} from "./synthStore";
+import type { Readable, Writable } from "svelte/store";
 
-export type Point = [number, number]
+export type Point = [number, number];
 
 // TODO: [x] Center line on waveform drawing
 // TODO: [x] Fix point over-deletion (sort of)
@@ -13,38 +15,9 @@ export type Point = [number, number]
 // TODO: [x] Correct phase of output waveform
 // TODO: [x] Add grid to drawing canvas
 
-const audioCtx = new window.AudioContext();
-const mainGainNode = audioCtx.createGain();
-mainGainNode.connect(audioCtx.destination);
 
-class WaveformOscillatorNode {
-    node: AudioBufferSourceNode;
-    gain: GainNode;
-    note: NumberedNote;
 
-    constructor(buffer: AudioBuffer, note: NumberedNote, start: boolean = true) {
-        this.note = note;
-        this.gain = audioCtx.createGain();
-        this.gain.connect(mainGainNode);
-        this.node = audioCtx.createBufferSource();
-        this.node.connect(this.gain);
-        this.node.buffer = buffer;
-        this.node.loop = true;
-        if (start) {
-            this.node.start();
-        }
-    }
-
-    stop() {
-        this.node.stop();
-    }
-
-    disconnect(node: AudioNode) {
-        this.gain.disconnect(node);
-    }
-}
-
-const createWaveform = () => {
+export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
     // Drawn points on the svg interface
     const points: Writable<Point[]> = writable([[0, 0], [0, 0]]);
     // Index of the last point in points updated in the middle of a draw
@@ -55,9 +28,7 @@ const createWaveform = () => {
     const svgPath: Readable<string> = derived(points, ($points) => (
         `M ${_.flattenDeep($points).join(" ")}`
     ))
-    type AudioNodesObject = Partial<{ [key in NumberedNote]: WaveformOscillatorNode }>;
-    // Object of actively playing audio nodes by note
-    const audioNodes: Writable<AudioNodesObject> = writable({});
+
 
     let sampleInterval;  // used to update node audio while you draw
 
@@ -107,58 +78,11 @@ const createWaveform = () => {
         });
     }
 
-    /** Adjust the output gain based on the number of nodes to avoid clipping
-     * @param {number} numNodes - number of playing audio nodes
-     */
-    const updateVolume = (numNodes: number) => {
-        if (numNodes === 0) {
-            console.log(numNodes);
-            mainGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
-        }
-        else if (numNodes === 1) {
-            mainGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            mainGainNode.gain.linearRampToValueAtTime(0.75, audioCtx.currentTime + 0.01);
-        } else {
-            numNodes = Math.max(numNodes, 1);
-            mainGainNode.gain.value = 0.75 / (numNodes ** 0.6);
-        }
-    }
-
-    /** Start playing the waveform at the pitch of the given note
-     * @param {NumberedNote} note - note to play frequency of
-     */
-    const play = (note: NumberedNote) => {
-        const buffer = drawnWaveformToAudioBuffer(note, get(points));
-        const audioNode = new WaveformOscillatorNode(buffer, note);
-        audioNodes.update((current) => {
-            updateVolume(Object.keys(current).length + 1);
-            return ({...current, [note]: audioNode})
-        });
-    }
-
-    /** Stop playing the given note if it is playing
-     * @param {NumberedNote} note - note to stop playing
-     */
-    const stop = (note: NumberedNote) => {
-        if (note in get(audioNodes)) {
-            audioNodes.update((current) => {
-                updateVolume(Object.keys(current).length - 1);
-                current[note].stop();
-                delete current[note];
-                return current;
-            });
-        }
-    }
-
     /** Refresh all playing audio nodes */
     const updateAllPlayingNotes = () => {
         audioNodes.update((nodes) => {
             Object.entries(get(audioNodes)).forEach(([note, node]) => {
-                node.stop();
-                node.disconnect(mainGainNode);
-                delete nodes[note];
-                const buffer = drawnWaveformToAudioBuffer(note as NumberedNote, get(points));
-                nodes[note] = new WaveformOscillatorNode(buffer, note as NumberedNote);
+                node.buffer = drawnWaveformToAudioBuffer(note as NumberedNote, get(points));
             })
             return nodes;
         })
@@ -172,6 +96,7 @@ const createWaveform = () => {
         }
     }
 
+
     /** Mark that you are done drawing (click & drag) */
     const endDraw = () => {
         isDrawing.set(false);
@@ -184,9 +109,13 @@ const createWaveform = () => {
     return {
         subscribe: points.subscribe,
         set: points.set,
+        get points() {
+            return get(points);
+        },
         addPoint,
-        play,
-        stop,
+        get drawnPoints() {
+            return get(points);
+        },
         svgPath,
         get isDrawing(): boolean {
             return get(isDrawing)
@@ -197,4 +126,4 @@ const createWaveform = () => {
 }
 
 
-export const waveformStore = createWaveform();
+// export const waveformStore = createWaveform();

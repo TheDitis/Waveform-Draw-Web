@@ -1,7 +1,7 @@
 <script>
-    import {waveformStore} from "../stores/waveformStore"
+    import synth from "../stores/synthStore";
     export let color = '#00d0ff';
-    const path = waveformStore.svgPath
+    const path = synth.waveform.svgPath
 </script>
 
 

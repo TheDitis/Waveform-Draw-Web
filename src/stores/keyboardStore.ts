@@ -9,7 +9,7 @@ import type {NumberedNote} from "../music/music";
 import {derived, get, readable, writable} from "svelte/store";
 import type {Readable, Writable} from "svelte/store";
 import type {BaseKey, Key} from "../types/keyboardTypes";
-import {waveformStore} from "./waveformStore";
+import synth from "./synthStore";
 
 let options = {
     scaleX: 2,
@@ -73,7 +73,7 @@ const createKeyboardStore = () => {
         notesPlaying.update(
             (playing) => [...playing, note]
         );
-        waveformStore.play(note);
+        synth.play(note);
     }
 
     /** Stop playing a given note
@@ -83,7 +83,7 @@ const createKeyboardStore = () => {
         notesPlaying.update((playing) => (
             playing.filter((curNote) => note !== curNote)
         ));
-        waveformStore.stop(note);
+        synth.stop(note);
     }
 
     /** Whether the given note is playing
