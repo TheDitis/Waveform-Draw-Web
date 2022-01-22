@@ -5,4 +5,11 @@
 </script>
 
 
-<path d={$path} stroke={color} stroke-width={3} fill="none"/>
+<path d={$path} stroke={color} stroke-width={5} fill="none"/>
+
+
+<style>
+    path {
+        filter: blur(2px);
+    }
+</style>

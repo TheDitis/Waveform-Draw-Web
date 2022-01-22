@@ -9,6 +9,12 @@ const audioCtx = new window.AudioContext();
 const mainGainNode = audioCtx.createGain();
 mainGainNode.connect(audioCtx.destination);
 
+// TODO: [ ] ADSR
+// TODO: [ ] Filter
+// TODO: [ ] Select default waveforms (sine, saw, square)
+// TODO: [ ] Fade between multiple waveforms
+// TODO: [ ] Upload image (connect OpenCV python script endpoint)
+
 /** AudioNode wrapper with gain node & several hel */
 export class WaveformOscillatorNode {
     /** actual AudioBufferSourceNode object */
@@ -97,7 +103,6 @@ const createSynthStore = () => {
             return ({...current, [note]: audioNode})
         });
     }
-
 
     /** Stop playing the given note if it is playing
      * @param {NumberedNote} note - note to stop playing

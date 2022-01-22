@@ -48,8 +48,8 @@
         on:mousemove={onMove}
     >
         {#if w && h}
-            <WaveformGrid {w} {h}/>
             <WaveformLine />
+            <WaveformGrid {w} {h}/>
         {/if}
     </svg>
 </div>
@@ -65,6 +65,5 @@
     .canvas {
         width: 100%;
         height: 100%;
-        filter: blur(1px);
     }
 </style>

@@ -7,15 +7,6 @@ import type { Readable, Writable } from "svelte/store";
 
 export type Point = [number, number];
 
-// TODO: [x] Center line on waveform drawing
-// TODO: [x] Fix point over-deletion (sort of)
-// TODO: [x] Fill in missing points (not specifically drawn) for output waveform
-// TODO: [x] Make notes actually play selected pitch
-// TODO: [x] Play notes with keyboard
-// TODO: [x] Correct phase of output waveform
-// TODO: [x] Add grid to drawing canvas
-
-
 
 export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
     // Drawn points on the svg interface
@@ -28,7 +19,6 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
     const svgPath: Readable<string> = derived(points, ($points) => (
         `M ${_.flattenDeep($points).join(" ")}`
     ))
-
 
     let sampleInterval;  // used to update node audio while you draw
 
@@ -96,7 +86,6 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
         }
     }
 
-
     /** Mark that you are done drawing (click & drag) */
     const endDraw = () => {
         isDrawing.set(false);
@@ -124,6 +113,3 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
         endDraw,
     }
 }
-
-
-// export const waveformStore = createWaveform();
