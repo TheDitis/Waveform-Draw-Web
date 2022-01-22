@@ -1,39 +1,6 @@
 import _ from "lodash";
 import type {Point} from "../stores/waveformStore";
-import type {NumberedNote} from "../music/music";
-import {getNoteFrequency} from "../music";
-import {make_download} from "./toWav";
 
-const audioCtx = new window.AudioContext();
-
-/** Turns raw audio data into and AudioBuffer object (also sets download link)
- * @param {NumberedNote} note - note this waveform should play
- * @param {Point[]} points - array of drawn points
- * @returns {AudioBuffer} - buffer to be used with web-audio API
- */
-export const drawnWaveformToAudioBuffer = (note: NumberedNote, points: Point[]): AudioBuffer => {
-    // get initial waveform from drawn points, passing the desired frequency
-    let wav = drawnPointsToWaveform(
-        points,
-        Math.floor(audioCtx.sampleRate / getNoteFrequency(note))
-    )
-    let max = Math.max(...wav);
-    let min = Math.min(...wav);
-    let mid = (max + min) / 2;
-    wav = wav.map((val) => - (val - (mid + min)) / mid) // center between -1 & 1 (flipping phase too)
-    max = Math.max(...wav);
-    min = Math.min(...wav);
-    mid = (max + min) / 2;
-    let buffer = audioCtx.createBuffer(1, wav.length, audioCtx.sampleRate);
-    for (let chan = 0; chan < 1; chan++) {
-        const channelBuffer = buffer.getChannelData(chan);
-        for (let i = 0; i < buffer.length; i++) {
-            channelBuffer[i] = wav[i];
-        }
-    }
-    make_download(buffer, buffer.length);
-    return buffer;
-}
 
 /** Fills in points to the waveform that weren't specifically drawn
  * Example: clicking once in the top left and once in the bottom right creates

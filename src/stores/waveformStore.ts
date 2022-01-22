@@ -1,12 +1,16 @@
-import { derived, get, writable } from "svelte/store";
+import type {Readable, Writable} from "svelte/store";
+import {derived, get, writable} from "svelte/store";
 import _ from "lodash";
-import {drawnWaveformToAudioBuffer} from "../utils/audioUtils";
+import {drawnPointsToWaveform} from "../utils/audioUtils";
 import type {NumberedNote} from "../music/music";
 import type {AudioNodesObject} from "./synthStore";
-import type { Readable, Writable } from "svelte/store";
+import {getNoteFrequency} from "../music";
+import {make_download} from "../utils/toWav";
 
 export type Point = [number, number];
 
+
+const audioCtx = new window.AudioContext();
 
 export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
     // Drawn points on the svg interface
@@ -19,6 +23,7 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
     const svgPath: Readable<string> = derived(points, ($points) => (
         `M ${_.flattenDeep($points).join(" ")}`
     ))
+    const drawingHeight: Writable<number> = writable(0);
 
     let sampleInterval;  // used to update node audio while you draw
 
@@ -72,7 +77,8 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
     const updateAllPlayingNotes = () => {
         audioNodes.update((nodes) => {
             Object.entries(get(audioNodes)).forEach(([note, node]) => {
-                node.buffer = drawnWaveformToAudioBuffer(note as NumberedNote, get(points));
+                node.buffer = toAudioBuffer(note as NumberedNote);
+                node.hardStart();
             })
             return nodes;
         })
@@ -95,6 +101,32 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
         updateAllPlayingNotes();
     }
 
+    /** Turns raw audio data into and AudioBuffer object (also sets download link)
+     * @param {NumberedNote} note - note this waveform should play
+     * @returns {AudioBuffer} - buffer to be used with web-audio API
+     */
+    const toAudioBuffer = (note: NumberedNote): AudioBuffer => {
+        // get initial waveform from drawn points, passing the desired frequency
+        let wav = drawnPointsToWaveform(
+            get(points),
+            Math.floor(audioCtx.sampleRate / getNoteFrequency(note))
+        )
+        // let max = Math.max(...wav);
+        let max = get(drawingHeight)
+        let min = 0 // Math.min(...wav);
+        let mid = Math.round(max / 2);
+        wav = wav.map((val) => - (val - (mid + min)) / mid) // center between -1 & 1 (flipping phase too)
+        let buffer = audioCtx.createBuffer(1, wav.length, audioCtx.sampleRate);
+        for (let chan = 0; chan < 1; chan++) {
+            const channelBuffer = buffer.getChannelData(chan);
+            for (let i = 0; i < buffer.length; i++) {
+                channelBuffer[i] = wav[i];
+            }
+        }
+        make_download(buffer, buffer.length);
+        return buffer;
+    }
+
     return {
         subscribe: points.subscribe,
         set: points.set,
@@ -109,7 +141,9 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
         get isDrawing(): boolean {
             return get(isDrawing)
         },
+        drawingHeight,
         startDraw,
         endDraw,
+        toAudioBuffer,
     }
 }

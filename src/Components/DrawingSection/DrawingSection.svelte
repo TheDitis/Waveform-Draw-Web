@@ -10,7 +10,8 @@
     onMount(() => {
         if (canvas) {
             const midpoint = Math.round(canvas.clientHeight / 2)
-            synth.waveform.set([[0, midpoint], [canvas.clientWidth, midpoint]])
+            synth.waveform.set([[0, midpoint], [canvas.clientWidth, midpoint]]);
+            synth.waveform.drawingHeight.set(canvas.clientHeight);
         }
     })
 
