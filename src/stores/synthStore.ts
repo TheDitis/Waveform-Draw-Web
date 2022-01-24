@@ -136,6 +136,7 @@ const createSynthStore = () => {
 
     return {
         waveform,
+        envelope,
         play,
         stop,
     }

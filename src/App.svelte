@@ -2,6 +2,7 @@
 	import DrawingSection from "./Components/DrawingSection/DrawingSection.svelte";
 	import Keyboard from "./Components/Keyboard.svelte";
 	import KeyEventHandler from "./Components/KeyEventHandler.svelte";
+	import EnvelopeControls from "./Components/EnvelopeControls/EnvelopeControls.svelte";
 	let color = "#ff3e00";
 
 </script>
@@ -9,6 +10,7 @@
 <main style="--color: {color}">
 	<DrawingSection/>
 	<Keyboard/>
+	<EnvelopeControls/>
 	<KeyEventHandler/>
 </main>
 
@@ -21,7 +23,5 @@
 		top: -50px;
 		padding: 0;
 		margin: 0;
-		/*box-sizing: border-box;*/
-		/*border: 2px solid black;*/
 	}
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import WaveformLine from "../WaveformLine.svelte";
+    import WaveformLine from "./WaveformLine.svelte";
     import synth from "../../stores/synthStore";
     import WaveformGrid from "./WaveformGrid.svelte";
 
