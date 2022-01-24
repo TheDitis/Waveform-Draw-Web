@@ -13,17 +13,10 @@
     <EnvelopeVisualizer {width}/>
 
     <div class="knobSection">
-        <SynthParameter label="Attack" bind:value={$A} step={10} strokeWidth={8} size={60} min={ENVELOPE_LIMITS.A.lo}
-                        max={ENVELOPE_LIMITS.A.hi} primaryColor="#E844C3" secondaryColor="#E7B6DC" textColor="#E844C3"/>
-        <SynthParameter label="Decay" bind:value={$D} step={10} strokeWidth={8} size={60} min={ENVELOPE_LIMITS.D.lo}
-                        max={ENVELOPE_LIMITS.D.hi}
-                        primaryColor="#E844C3" secondaryColor="#E7B6DC" textColor="#E844C3"/>
-        <SynthParameter label="Sustain" bind:value={$S} step={0.01} strokeWidth={8} size={60} min={ENVELOPE_LIMITS.S.lo}
-                        max={ENVELOPE_LIMITS.S.hi}
-                        primaryColor="#E844C3" secondaryColor="#E7B6DC" textColor="#E844C3"/>
-        <SynthParameter label="Release" bind:value={$R} step={10} strokeWidth={8} size={60} min={ENVELOPE_LIMITS.R.lo}
-                        max={ENVELOPE_LIMITS.R.hi}
-                        primaryColor="#E844C3" secondaryColor="#E7B6DC" textColor="#E844C3"/>
+        <SynthParameter label="Attack" bind:value={$A} min={ENVELOPE_LIMITS.A.lo} max={ENVELOPE_LIMITS.A.hi}/>
+        <SynthParameter label="Decay" bind:value={$D} min={ENVELOPE_LIMITS.D.lo} max={ENVELOPE_LIMITS.D.hi}/>
+        <SynthParameter label="Sustain" bind:value={$S} min={ENVELOPE_LIMITS.S.lo} max={ENVELOPE_LIMITS.S.hi} step={0.01}/>
+        <SynthParameter label="Release" bind:value={$R} min={ENVELOPE_LIMITS.R.lo} max={ENVELOPE_LIMITS.R.hi}/>
     </div>
 </div>
 

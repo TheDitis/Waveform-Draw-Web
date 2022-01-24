@@ -29,9 +29,8 @@ export class WaveformOscillatorNode {
     /** Create a new WaveformOscillatorNode
      * @param {AudioBuffer} buffer - actual audio data to load into the node
      * @param {NumberedNote} note - note this oscillator is playing
-     * @param {boolean} [start=true] - starts playing by default
      */
-    constructor(buffer: AudioBuffer, note: NumberedNote, start: boolean = true) {
+    constructor(buffer: AudioBuffer, note: NumberedNote) {
         this.note = note;
         this.gain = audioCtx.createGain();
         this.gain.connect(mainGainNode);
@@ -63,25 +62,24 @@ export class WaveformOscillatorNode {
         this.gain.gain.value = 0;
         this.node.start();
         this.rampGain(1, attack);
-        this.rampGain(sustain, decay);
+        setTimeout(() => this.rampGain(sustain, decay), attack);
     }
-
-    /** Start playing without any envelope */
-    hardStart() {
-        this.node.start();
-    }
-aa
 
     /** Stop playing with amplitude envelope
      * @param {number} release - release time in milliseconds
      */
     stop(release: number) {
-        // this.gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.01)
-        this.rampGain(0, release)
+        this.gain.gain.cancelScheduledValues(0);
+        this.rampGain(0, release);
         setTimeout(() => {
             this.node.stop();
             this.node.disconnect(this.gain);
         }, release + 5)
+    }
+
+    /** Start playing without any envelope */
+    hardStart() {
+        this.node.start();
     }
 
     /** Stop without any envelope or disconnecting */
@@ -114,6 +112,7 @@ const createSynthStore = () => {
     const play = (note: NumberedNote) => {
         const buffer = waveform.toAudioBuffer(note);
         const audioNode = new WaveformOscillatorNode(buffer, note);
+        console.log('a: ', envelope.a, 'd: ', envelope.d, 's: ', envelope.s, 'r: ', envelope.r, 'peak: ', envelope.peak)
         audioNode.start(envelope.a, envelope.d, envelope.s, envelope.peak)
         audioNodes.update((current) => ({
             ...current,
