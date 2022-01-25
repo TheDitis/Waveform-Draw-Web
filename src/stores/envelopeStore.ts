@@ -18,9 +18,9 @@ type ADSRLimitsObject = {
  */
 export const ENVELOPE_LIMITS: ADSRLimitsObject = {
     A: { lo: 0, hi: 3000 },
-    D: { lo: 0, hi: 5000 },
+    D: { lo: 0, hi: 3000 },
     S: { lo: 0, hi: 1 },
-    R: { lo: 0, hi: 5000 },
+    R: { lo: 0, hi: 3000 },
 }
 
 type EnvelopeValuesObject = {

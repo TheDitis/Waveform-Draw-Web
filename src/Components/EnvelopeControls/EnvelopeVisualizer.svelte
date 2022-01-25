@@ -1,31 +1,41 @@
 <script lang="ts">
     import synth from "../../stores/synthStore";
-    import type {Point} from "../../stores/waveformStore";
+    import {ENVELOPE_LIMITS} from "../../stores/envelopeStore";
 
     export let width = 600;
     export let height = 180;
     export let bgColor = '#1e1e1e';
+    export let color = '#01dcc5';
     const {A, D, S, R} = synth.envelope;
+
+    const releaseMax = width / 3;
+    const adsMax = releaseMax * 2;
+    const adFactor = adsMax / (ENVELOPE_LIMITS.A.hi + ENVELOPE_LIMITS.D.hi);
+    const rFactor = releaseMax / ENVELOPE_LIMITS.R.hi;
 
     const guideColor = (i: number): string => i % 2 === 0 ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)';
 
     const quarterHeight = height / 4;
 
-    // calculate svg path of the envelope
-    let path: string;
+    let adPath: string;  // path for attack+decay line
+    let sPath: string;  // path for sustain line (dotted)
+    let rPath: string;  // path for release line
     $: {
         const sustainY = height - ( $S * height );
-        let points: Point[] = [ [0, height], [$A / 10, 0], [$D / 10, sustainY], [200, sustainY], [$R / 10, height], [width, height] ];
-        path = points.reduce((acc, pt, i) => acc.concat([
-            i === 0 ? pt[0] : pt[0] + acc[acc.length - 2],
-            pt[1]
-        ]), ['M'] as any[]).join(' ');
+        adPath = 'M ' + [0, height, $A * adFactor, 0, ($A + $D) * adFactor, sustainY].join(' ');
+        sPath = 'M ' + [adsMax, sustainY, ($A + $D) * adFactor, sustainY].join(' ');  // points flipped so dots don't move
+        rPath = 'M ' + [adsMax, sustainY, adsMax + $R * rFactor, height].join(' ');
     }
 </script>
 
 <svg viewBox={`0 0 ${width} ${height}`} {width} {height}>
     <rect x={0} y={0} {width} {height} fill="none" stroke={guideColor(0)}/>
-    <path d={path} stroke="white" stroke-width="2px" fill="none"/>
+<!--    <path d={path} stroke="white" stroke-width="2px" fill="none"/>-->
+    <g class="drawnEnvelope">
+        <path d={adPath} stroke={color} stroke-width={3} fill="none"/>
+        <path d={sPath} stroke={color} stroke-width={3} fill="none" stroke-dasharray="5, 5"/>
+        <path d={rPath} stroke={color} stroke-width={3} fill="none"/>
+    </g>
 
     <!-- Y-axis guide lines  -->
     {#each Array(5).fill(0) as _, i}
@@ -34,7 +44,7 @@
 </svg>
 
 <style>
-    path {
-
+    .drawnEnvelope {
+        /*filter: blur(1px);*/
     }
 </style>
