@@ -29,10 +29,23 @@ export const chunkSiblings = <T>(arr: T[]): [T, T][] => (arr.reduce(
 export const roundDown = (n: number, maxDecimal: number = 2): number => {
     let nStr = n.toString();
     const dotInd = nStr.indexOf('.');
-    if (!dotInd) return n;
+    if (dotInd <= 0) return n;
     nStr = nStr.slice(0, Math.min(dotInd + maxDecimal, nStr.length) + 1);
-    nStr = _.dropRightWhile(nStr.split(''), (char) => (
+    let [wholeNum, decimal] = nStr.split('.')
+    decimal = _.dropRightWhile(decimal.split(''), (char) => (
         char === '0' || char === '.'
     )).join('');
-    return Number(nStr);
+    return Number(`${wholeNum}.${decimal}`);
 }
+
+/**
+ * clamp a value within a given range between min & max
+ * @param {number} value - value to potentially constrain
+ * @param {number} min - minimum value to return
+ * @param {number} max - maximum value to return
+ * @returns {number} - if value is less than min, min, if it's greater than max,
+ *      max, otherwise return value
+ */
+export const clamp = (value: number, min: number, max: number): number => (
+    Math.max(min, Math.min(value, max))
+);

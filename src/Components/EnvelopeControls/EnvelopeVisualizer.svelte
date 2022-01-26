@@ -1,12 +1,15 @@
 <script lang="ts">
     import synth from "../../stores/synthStore";
-    import {ENVELOPE_LIMITS} from "../../stores/envelopeStore";
+    import {type ADSRKey, ENVELOPE_LIMITS} from "../../stores/envelopeStore";
+    import {clamp} from "../../utils/utils";
 
     export let width = 600;
     export let height = 180;
     export let bgColor = '#1e1e1e';
     export let color = '#01dcc5';
     const {A, D, S, R} = synth.envelope;
+
+    let svgRef: SVGElement;
 
     const releaseMax = width / 3;
     const adsMax = releaseMax * 2;
@@ -26,25 +29,63 @@
         sPath = 'M ' + [adsMax, sustainY, ($A + $D) * adFactor, sustainY].join(' ');  // points flipped so dots don't move
         rPath = 'M ' + [adsMax, sustainY, adsMax + $R * rFactor, height].join(' ');
     }
+
+    $: additionFactor = {
+        A: 0,
+        D: $A * adFactor,
+    }
+
+    const posToValue = (xPos: number, control: ADSRKey): number => {
+        const limits = ENVELOPE_LIMITS[control];
+        const multFactor = ((width / 3) / (limits.hi))
+        return clamp(xPos - additionFactor[control], 0, width / 3) / multFactor;
+    }
+
+    const isDragging: { [key in ADSRKey]: boolean } = {
+        A: false,
+        D: false,
+        S: false,
+        R: false,
+    }
+
+    const handleDragStart = (control: ADSRKey) => () => {
+        if (!isDragging[control]) isDragging[control] = true;
+        const updateValue = (moveEvent: MouseEvent) => {
+            synth.envelope[control].set(
+                posToValue(
+                    moveEvent.offsetX, // + additionFactor[control],
+                    control
+                )
+            );
+        }
+        svgRef.addEventListener('mousemove', updateValue);
+        window.addEventListener('mouseup', () => {
+            svgRef.removeEventListener('mousemove', updateValue);
+        })
+    }
 </script>
 
-<svg viewBox={`0 0 ${width} ${height}`} {width} {height}>
+<svg viewBox={`0 0 ${width} ${height + 25}`} {width} height={height + 25} bind:this={svgRef} >
+    <!-- Y-axis guide lines  -->
+    {#each Array(5).fill(0) as _, i}
+        <line x1={0} y1={quarterHeight * i} x2={width} y2={quarterHeight * i} stroke-width={1} stroke={guideColor(i)} />
+    {/each}
+
     <rect x={0} y={0} {width} {height} fill="none" stroke={guideColor(0)}/>
-<!--    <path d={path} stroke="white" stroke-width="2px" fill="none"/>-->
     <g class="drawnEnvelope">
         <path d={adPath} stroke={color} stroke-width={3} fill="none"/>
         <path d={sPath} stroke={color} stroke-width={3} fill="none" stroke-dasharray="5, 5"/>
         <path d={rPath} stroke={color} stroke-width={3} fill="none"/>
     </g>
 
-    <!-- Y-axis guide lines  -->
-    {#each Array(5).fill(0) as _, i}
-        <line x1={0} y1={quarterHeight * i} x2={width} y2={quarterHeight * i} stroke-width={1} stroke={guideColor(i)} />
-    {/each}
+    <g class="attackHandle" on:mousedown={handleDragStart('A')} opacity={0.4}>
+        <line x1={$A * adFactor} y1={0} x2={$A * adFactor} y2={height + 5} stroke="white" stroke-width={3} />
+        <line x1={$A * adFactor} y1={height + 13} x2={$A * adFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round" />
+    </g>
+
+    <g class="decayHandle" on:mousedown={handleDragStart('D')} opacity={0.4}>
+        <line x1={$A * adFactor + $D * adFactor} y1={0} x2={$A * adFactor + $D * adFactor} y2={height + 5} stroke="white" stroke-width={3} />
+        <line x1={$A * adFactor + $D * adFactor} y1={height + 13} x2={$A * adFactor + $D * adFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round" />
+    </g>
 </svg>
 
-<style>
-    .drawnEnvelope {
-        /*filter: blur(1px);*/
-    }
-</style>

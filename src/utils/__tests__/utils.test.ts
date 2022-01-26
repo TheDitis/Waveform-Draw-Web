@@ -11,5 +11,11 @@ describe('utils', () => {
         it('should return 12.2000000001 when given 12.2000000001 and maxDecimal of 10', () => {
             expect(roundDown(12.2000000001, 10)).toEqual(12.2000000001);
         });
+        it('should return 2000 when given 2000', () => {
+            expect(roundDown(2000)).toEqual(2000)
+        });
+        it('should return 2000 when given 2000.0000000000002', () => {
+            expect(roundDown(2000.0000000000002)).toEqual(2000)
+        });
     });
 });

@@ -3,7 +3,7 @@ import {get, writable} from "svelte/store";
 
 // Envelope Parameter keys
 // A = Attack, D = Decay, S = Sustain, R = Release
-type ADSRKey = 'A' | 'D' | 'S' | 'R';
+export type ADSRKey = 'A' | 'D' | 'S' | 'R';
 // Object containing upper and lower limits
 type ADSRItemLimits = { lo: number, hi: number }
 // Upper and lower limits for each ADSR parameter
@@ -17,7 +17,7 @@ type ADSRLimitsObject = {
  * @type {ADSRLimitsObject}
  */
 export const ENVELOPE_LIMITS: ADSRLimitsObject = {
-    A: { lo: 0, hi: 3000 },
+    A: { lo: 0, hi: 2000 },
     D: { lo: 0, hi: 3000 },
     S: { lo: 0, hi: 1 },
     R: { lo: 0, hi: 3000 },
