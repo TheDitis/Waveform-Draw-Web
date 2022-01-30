@@ -33,23 +33,18 @@
     $: additionFactor = {
         A: 0,
         D: $A * adFactor,
+        R: adsMax,
     }
 
     const posToValue = (xPos: number, control: ADSRKey): number => {
         const limits = ENVELOPE_LIMITS[control];
         const multFactor = ((width / 3) / (limits.hi))
-        return clamp(xPos - additionFactor[control], 0, width / 3) / multFactor;
-    }
-
-    const isDragging: { [key in ADSRKey]: boolean } = {
-        A: false,
-        D: false,
-        S: false,
-        R: false,
+        return Math.round(
+            clamp(xPos - additionFactor[control], 0, width / 3) / multFactor
+        );
     }
 
     const handleDragStart = (control: ADSRKey) => () => {
-        if (!isDragging[control]) isDragging[control] = true;
         const updateValue = (moveEvent: MouseEvent) => {
             synth.envelope[control].set(
                 posToValue(
@@ -86,6 +81,11 @@
     <g class="decayHandle" on:mousedown={handleDragStart('D')} opacity={0.4}>
         <line x1={$A * adFactor + $D * adFactor} y1={0} x2={$A * adFactor + $D * adFactor} y2={height + 5} stroke="white" stroke-width={3} />
         <line x1={$A * adFactor + $D * adFactor} y1={height + 13} x2={$A * adFactor + $D * adFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round" />
+    </g>
+
+    <g class="releaseHandle" on:mousedown={handleDragStart('R')} opacity={0.4}>
+        <line x1={adsMax + $R * rFactor} y1={0} x2={adsMax + $R * rFactor} y2={height + 5} stroke="white" stroke-width={3} />
+        <line x1={adsMax + $R * rFactor} y1={height + 13} x2={adsMax + $R * rFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round" />
     </g>
 </svg>
 
