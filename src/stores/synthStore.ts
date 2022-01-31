@@ -112,8 +112,7 @@ const createSynthStore = () => {
     const play = (note: NumberedNote) => {
         const buffer = waveform.toAudioBuffer(note);
         const audioNode = new WaveformOscillatorNode(buffer, note);
-        console.log('a: ', envelope.a, 'd: ', envelope.d, 's: ', envelope.s, 'r: ', envelope.r, 'peak: ', envelope.peak)
-        audioNode.start(envelope.a, envelope.d, envelope.s, envelope.peak)
+        audioNode.start(envelope.a, envelope.d, envelope.s, envelope.p)
         audioNodes.update((current) => ({
             ...current,
             [note]: audioNode

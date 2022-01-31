@@ -3,7 +3,7 @@ import {get, writable} from "svelte/store";
 
 // Envelope Parameter keys
 // A = Attack, D = Decay, S = Sustain, R = Release
-export type ADSRKey = 'A' | 'D' | 'S' | 'R';
+export type ADSRKey = 'A' | 'D' | 'S' | 'R' | 'P';
 // Object containing upper and lower limits
 type ADSRItemLimits = { lo: number, hi: number }
 // Upper and lower limits for each ADSR parameter
@@ -12,8 +12,8 @@ type ADSRLimitsObject = {
 }
 
 /** Upper & lower limits for each Envelope parameter
- * All values except Sustain (S) are in milliseconds, which should be volume
- * levels (0-1)
+ * All values except Sustain & Peak (S & P) are in milliseconds, which should be
+ * volume levels (0-1)
  * @type {ADSRLimitsObject}
  */
 export const ENVELOPE_LIMITS: ADSRLimitsObject = {
@@ -21,6 +21,7 @@ export const ENVELOPE_LIMITS: ADSRLimitsObject = {
     D: { lo: 0, hi: 3000 },
     S: { lo: 0, hi: 1 },
     R: { lo: 0, hi: 3000 },
+    P: { lo: 0, hi: 1 },
 }
 
 type EnvelopeValuesObject = {
@@ -35,6 +36,7 @@ const DEFAULTS: EnvelopeValuesObject = {
     D: 1000,
     S: 0.5,
     R: 500,
+    P: 0.9,
 }
 
 export const createEnvelope = () => {
@@ -48,11 +50,11 @@ export const createEnvelope = () => {
     const R: Writable<number> = writable(DEFAULTS.R);
 
     // Peak volume (attack climbs to, decay falls from)
-    const Peak: Writable<number> = writable(0.9)
+    const P: Writable<number> = writable(0.9)
 
     return {
         A, D, S, R,
-        Peak,
+        P,
         get a() {
             return get(A);
         },
@@ -65,8 +67,8 @@ export const createEnvelope = () => {
         get r() {
             return get(R);
         },
-        get peak() {
-            return get(Peak);
+        get p() {
+            return get(P);
         }
     }
 }
