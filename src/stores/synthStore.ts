@@ -61,7 +61,7 @@ export class WaveformOscillatorNode {
     start(attack: number, decay: number, sustain: number, peak: number) {
         this.gain.gain.value = 0;
         this.node.start();
-        this.rampGain(1, attack);
+        this.rampGain(peak, attack);
         setTimeout(() => this.rampGain(sustain, decay), attack);
     }
 

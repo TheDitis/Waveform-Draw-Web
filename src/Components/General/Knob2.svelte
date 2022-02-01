@@ -21,7 +21,6 @@
     }
 
     function pointerDown({ clientY }: MouseEvent) {
-        console.log({ clientY });
         startY = clientY;
         startValue = value;
         window.addEventListener('pointermove', pointerMove);

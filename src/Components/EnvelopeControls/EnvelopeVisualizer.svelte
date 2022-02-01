@@ -7,7 +7,7 @@
     export let height = 180;
     export let bgColor = '#1e1e1e';
     export let color = '#01dcc5';
-    const {A, D, S, R, Peak} = synth.envelope;
+    const {A, D, S, R, P} = synth.envelope;
 
     let svgRef: SVGElement;
 
@@ -26,7 +26,7 @@
     let rPath: string;  // path for release line
     $: {
         const sustainY = calcY($S);
-        adPath = 'M ' + [0, height, $A * adFactor, 0, ($A + $D) * adFactor, sustainY].join(' ');
+        adPath = 'M ' + [0, height, $A * adFactor, calcY($P), ($A + $D) * adFactor, sustainY].join(' ');
         sPath = 'M ' + [adsMax, sustainY, ($A + $D) * adFactor, sustainY].join(' ');  // points flipped so dots don't move
         rPath = 'M ' + [adsMax, sustainY, adsMax + $R * rFactor, height].join(' ');
     }
@@ -36,8 +36,15 @@
         D: $A * adFactor,
         R: adsMax,
         S: 0,
+        P: 0,
     }
 
+    /**
+     * Convert the position on the svg to the corresponding value
+     * @param {number} pos - x or y position (whichever is relevant for the given control)
+     * @param {ADSRKey} control - the capitalized initial of the envelope control to calculate a value for
+     * @returns {number} - the new value that's valid for the given control
+     */
     const posToValue = (pos: number, control: ADSRKey): number => {
         if (['A', 'D', 'R'].includes(control)) {
             const limits = ENVELOPE_LIMITS[control];
@@ -46,11 +53,15 @@
                 clamp(pos - additionFactor[control], 0, width / 3) / multFactor
             );
         } else {
-            console.log((height - pos) / height)
-            return  (height - pos) / height;
+            return  clamp((height - pos) / height, 0, 1);
         }
     }
 
+    /**
+     * Create a dragHandler for the given control
+     * @param {ADSRKey} control - the envelope control the returned handler should update
+     * @returns {() => void} - handler for drag-start that updates the given control on drag
+     */
     const handleDragStart = (control: ADSRKey) => () => {
         const isY = ['S', 'P'].includes(control);
         const updateValue = (moveEvent: MouseEvent) => {
@@ -99,6 +110,11 @@
     <g class="sustainHandle" on:mousedown={handleDragStart('S')} opacity={0.4}>
         <line x1={0} y1={calcY($S)} x2={width + 5} y2={calcY($S)} stroke="white" stroke-width={3} />
         <line x1={width + 13} y1={calcY($S)} x2={width + 13} y2={calcY($S)} stroke="white" stroke-width={16} stroke-linecap="round" />
+    </g>
+
+    <g class="peakHandle" on:mousedown={handleDragStart('P')} opacity={0.4}>
+        <line x1={0} y1={calcY($P)} x2={width + 5} y2={calcY($P)} stroke="white" stroke-width={3} />
+        <line x1={width + 13} y1={calcY($P)} x2={width + 13} y2={calcY($P)} stroke="white" stroke-width={16} stroke-linecap="round" />
     </g>
 </svg>
 

@@ -18,7 +18,6 @@
 
     $: verticals = Array(nVertical).fill(0).map((_, i) => w / nVertical * i);
     $: horizontals = createLogarithmicHorizontals(nHorizontal, h || 0);
-    $: console.log(horizontals)
 </script>
 
 
