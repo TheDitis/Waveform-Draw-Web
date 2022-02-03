@@ -11,6 +11,7 @@
 
     let svgRef: SVGElement;
 
+    const X_SHIFT = 8;
     const releaseMax = width / 3;
     const adsMax = releaseMax * 2;
     const adFactor = adsMax / (ENVELOPE_LIMITS.A.hi + ENVELOPE_LIMITS.D.hi);
@@ -67,7 +68,7 @@
         const updateValue = (moveEvent: MouseEvent) => {
             synth.envelope[control].set(
                 posToValue(
-                    isY ? moveEvent.offsetY : moveEvent.offsetX,
+                    (isY ? moveEvent.offsetY : moveEvent.offsetX) - X_SHIFT,
                     control
                 )
             );
@@ -79,42 +80,44 @@
     }
 </script>
 
-<svg viewBox={`0 0 ${width + 25} ${height + 25}`} width={width + 25} height={height + 25} bind:this={svgRef} >
-    <!-- Y-axis guide lines  -->
-    {#each Array(5).fill(0) as _, i}
-        <line x1={0} y1={quarterHeight * i} x2={width} y2={quarterHeight * i} stroke-width={1} stroke={guideColor(i)} />
-    {/each}
+<svg viewBox={`0 0 ${width + 50} ${height + 50}`} width={width + 50} height={height + 50} bind:this={svgRef} >
+    <g transform="translate({X_SHIFT})">
+        <!-- Y-axis guide lines  -->
+        {#each Array(5).fill(0) as _, i}
+            <line x1={0} y1={quarterHeight * i} x2={width} y2={quarterHeight * i} stroke-width={1} stroke={guideColor(i)} />
+        {/each}
 
-    <rect x={0} y={0} {width} {height} fill="none" stroke={guideColor(0)}/>
-    <g class="drawnEnvelope">
-        <path d={adPath} stroke={color} stroke-width={3} fill="none"/>
-        <path d={sPath} stroke={color} stroke-width={3} fill="none" stroke-dasharray="5, 5"/>
-        <path d={rPath} stroke={color} stroke-width={3} fill="none"/>
-    </g>
+        <rect x={0} y={0} {width} {height} fill="none" stroke={guideColor(0)}/>
+        <g class="drawnEnvelope">
+            <path d={adPath} stroke={color} stroke-width={3} fill="none"/>
+            <path d={sPath} stroke={color} stroke-width={3} fill="none" stroke-dasharray="5, 5"/>
+            <path d={rPath} stroke={color} stroke-width={3} fill="none"/>
+        </g>
 
-    <g class="attackHandle" on:mousedown={handleDragStart('A')} opacity={0.4}>
-        <line x1={$A * adFactor} y1={0} x2={$A * adFactor} y2={height + 5} stroke="white" stroke-width={3} />
-        <line x1={$A * adFactor} y1={height + 13} x2={$A * adFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round" />
-    </g>
+        <g class="attackHandle" on:mousedown={handleDragStart('A')} opacity={0.4}>
+            <line x1={$A * adFactor} y1={0} x2={$A * adFactor} y2={height + 5} stroke="white" stroke-width={3}/>
+            <line x1={$A * adFactor} y1={height + 13} x2={$A * adFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round"/>
+        </g>
 
-    <g class="decayHandle" on:mousedown={handleDragStart('D')} opacity={0.4}>
-        <line x1={$A * adFactor + $D * adFactor} y1={0} x2={$A * adFactor + $D * adFactor} y2={height + 5} stroke="white" stroke-width={3} />
-        <line x1={$A * adFactor + $D * adFactor} y1={height + 13} x2={$A * adFactor + $D * adFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round" />
-    </g>
+        <g class="decayHandle" on:mousedown={handleDragStart('D')} opacity={0.4}>
+            <line x1={$A * adFactor + $D * adFactor} y1={0} x2={$A * adFactor + $D * adFactor} y2={height + 5} stroke="white" stroke-width={3}/>
+            <line x1={$A * adFactor + $D * adFactor} y1={height + 13} x2={$A * adFactor + $D * adFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round"/>
+        </g>
 
-    <g class="releaseHandle" on:mousedown={handleDragStart('R')} opacity={0.4}>
-        <line x1={adsMax + $R * rFactor} y1={0} x2={adsMax + $R * rFactor} y2={height + 5} stroke="white" stroke-width={3} />
-        <line x1={adsMax + $R * rFactor} y1={height + 13} x2={adsMax + $R * rFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round" />
-    </g>
+        <g class="releaseHandle" on:mousedown={handleDragStart('R')} opacity={0.4}>
+            <line x1={adsMax + $R * rFactor} y1={0} x2={adsMax + $R * rFactor} y2={height + 5} stroke="white" stroke-width={3}/>
+            <line x1={adsMax + $R * rFactor} y1={height + 13} x2={adsMax + $R * rFactor} y2={height + 13} stroke="white" stroke-width={16} stroke-linecap="round"/>
+        </g>
 
-    <g class="sustainHandle" on:mousedown={handleDragStart('S')} opacity={0.4}>
-        <line x1={0} y1={calcY($S)} x2={width + 5} y2={calcY($S)} stroke="white" stroke-width={3} />
-        <line x1={width + 13} y1={calcY($S)} x2={width + 13} y2={calcY($S)} stroke="white" stroke-width={16} stroke-linecap="round" />
-    </g>
+        <g class="sustainHandle" on:mousedown={handleDragStart('S')} opacity={0.4}>
+            <line x1={0} y1={calcY($S)} x2={width + 5} y2={calcY($S)} stroke="white" stroke-width={3}/>
+            <line x1={width + 13} y1={calcY($S)} x2={width + 13} y2={calcY($S)} stroke="white" stroke-width={16} stroke-linecap="round"/>
+        </g>
 
-    <g class="peakHandle" on:mousedown={handleDragStart('P')} opacity={0.4}>
-        <line x1={0} y1={calcY($P)} x2={width + 5} y2={calcY($P)} stroke="white" stroke-width={3} />
-        <line x1={width + 13} y1={calcY($P)} x2={width + 13} y2={calcY($P)} stroke="white" stroke-width={16} stroke-linecap="round" />
+        <g class="peakHandle" on:mousedown={handleDragStart('P')} opacity={0.4}>
+            <line x1={0} y1={calcY($P)} x2={width + 5} y2={calcY($P)} stroke="white" stroke-width={3}/>
+            <line x1={width + 13} y1={calcY($P)} x2={width + 13} y2={calcY($P)} stroke="white" stroke-width={16} stroke-linecap="round"/>
+        </g>
     </g>
 </svg>
 
