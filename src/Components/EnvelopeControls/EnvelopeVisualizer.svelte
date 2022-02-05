@@ -11,16 +11,16 @@
 
     let svgRef: SVGElement;
 
-    const X_SHIFT = 8;
+    const X_SHIFT = 8; // amt of padding to add so handles don't get cut off
     const releaseMax = width / 3;
     const adsMax = releaseMax * 2;
     const adFactor = adsMax / (ENVELOPE_LIMITS.A.hi + ENVELOPE_LIMITS.D.hi);
-    const rFactor = releaseMax / ENVELOPE_LIMITS.R.hi;
+    const rFactor = releaseMax / ENVELOPE_LIMITS.R.hi;  // multiplication factor for release
 
     const guideColor = (i: number): string => i % 2 === 0 ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)';
     const calcY = (val: number) => height - ( val * height );
 
-    const quarterHeight = height / 4;
+    const quarterHeight = height / 4; // for the visual guides
 
     let adPath: string;  // path for attack+decay line
     let sPath: string;  // path for sustain line (dotted)
@@ -32,6 +32,7 @@
         rPath = 'M ' + [adsMax, sustainY, adsMax + $R * rFactor, height].join(' ');
     }
 
+    // for each control, factors that its position builds off of
     $: additionFactor = {
         A: 0,
         D: $A * adFactor,
