@@ -3,6 +3,7 @@
 	import Keyboard from "./Components/Keyboard.svelte";
 	import KeyEventHandler from "./Components/KeyEventHandler.svelte";
 	import EnvelopeControls from "./Components/EnvelopeControls/EnvelopeControls.svelte";
+	import Modal from "./Components/Modal/Modal.svelte";
 	let color = "#ff3e00";
 
 </script>
@@ -12,6 +13,7 @@
 	<Keyboard/>
 	<EnvelopeControls/>
 	<KeyEventHandler/>
+	<Modal/>
 </main>
 
 <style>

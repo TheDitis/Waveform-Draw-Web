@@ -27,6 +27,7 @@
     "rollup-plugin-terser": "^7.0.0",
     "svelte": "^3.46.1",
     "svelte-check": "^1.0.0",
+    "svelte-feather-icons": "^4.0.0",
     "svelte-jester": "^1.1.5",
     "svelte-preprocess": "^4.0.0",
     "svg-piano": "^0.2.0",
