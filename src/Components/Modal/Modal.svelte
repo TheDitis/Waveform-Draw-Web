@@ -14,7 +14,6 @@
     <div
         class="modalScrim"
         on:click|self={() => {
-            console.log('closing');
             setModal(null)
         }}
     >

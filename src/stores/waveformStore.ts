@@ -25,6 +25,9 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
     ))
     const drawingHeight: Writable<number> = writable(0);
 
+    /** Whether this represents a valid waveform */
+    const isValid = derived(points, $points => $points.length > 2);
+
     let sampleInterval;  // used to update node audio while you draw
 
     /** Add a new point to points (called when drawing line)
@@ -145,5 +148,6 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
         startDraw,
         endDraw,
         toAudioBuffer,
+        isValid,
     }
 }

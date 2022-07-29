@@ -2,6 +2,9 @@
     import { keyboardStore } from "../stores/keyboardStore";
     import { DownloadIcon, ImageIcon, SettingsIcon } from "svelte-feather-icons";
     import { ModalKind, setModal } from "../stores/uiStore";
+    import synthStore from "../stores/synthStore";
+
+    const waveformIsValid = synthStore.waveform.isValid
 </script>
 
 <div class="Keyboard">
@@ -20,11 +23,19 @@
         {/each}
     </svg>
 
-    <a href="" id="download_link">
-        <button>
-            <DownloadIcon/>
-        </button>
-    </a>
+    {#if $waveformIsValid}
+        <a href="" id="download_link">
+            <button>
+                <DownloadIcon/>
+            </button>
+        </a>
+    {:else}
+        <a>
+            <button disabled>
+                <DownloadIcon/>
+            </button>
+        </a>
+    {/if}
 
     <a>
         <button on:click={() => {setModal(ModalKind.ImageUpload)}}>
