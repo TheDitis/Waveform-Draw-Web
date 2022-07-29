@@ -4,8 +4,15 @@
 	import KeyEventHandler from "./Components/KeyEventHandler.svelte";
 	import EnvelopeControls from "./Components/EnvelopeControls/EnvelopeControls.svelte";
 	import Modal from "./Components/Modal/Modal.svelte";
+	import { onMount } from "svelte";
 	let color = "#ff3e00";
+	import midiStore from "./stores/midiStore";
 
+	// TODO: Stop audio refresh when mouse lifted outside of window
+
+	onMount(async () => {
+		await midiStore.initialize();
+	})
 </script>
 
 <main style="--color: {color}">

@@ -53,7 +53,8 @@ const createKeyboardStore = () => {
     const keyboard: Readable<Key[]> = derived(
         [keys, notesPlaying],
         ([$keys, $notesPlaying]) => $keys.map((key) => {
-            const isPlaying = $notesPlaying.includes(key.notes[0]);
+            const isPlaying = $notesPlaying.includes(key.notes[0])
+                || $notesPlaying.includes(key.notes[1]);
             return {
                 ...key,
                 isPlaying,

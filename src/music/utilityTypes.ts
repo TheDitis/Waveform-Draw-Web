@@ -1,4 +1,4 @@
-import type {BlackNote, FlatModifier, Note, NoteModifier, NoteNumber, SharpModifier, WhiteNote} from "./music";
+import type {BlackNote, FlatModifier, Note, NoteModifier, SharpModifier, WhiteNote} from "./music";
 
 // const adjacentNotesUp = { 0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 0 } as const;
 const adjacentNotesUp = { 'C': 'D', 'D': 'E', 'E': 'F', 'F': 'G', 'G': 'A', 'A': 'B', 'B': 'C' } as const;

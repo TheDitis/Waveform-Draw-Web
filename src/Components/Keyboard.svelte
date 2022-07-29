@@ -1,6 +1,6 @@
 <script lang="ts">
     import { keyboardStore } from "../stores/keyboardStore";
-    import { DownloadIcon, ImageIcon } from "svelte-feather-icons";
+    import { DownloadIcon, ImageIcon, SettingsIcon } from "svelte-feather-icons";
     import { ModalKind, setModal } from "../stores/uiStore";
 </script>
 
@@ -29,6 +29,12 @@
     <a>
         <button on:click={() => {setModal(ModalKind.ImageUpload)}}>
             <ImageIcon/>
+        </button>
+    </a>
+
+    <a>
+        <button on:click={() => {setModal(ModalKind.Settings)}}>
+            <SettingsIcon/>
         </button>
     </a>
 

@@ -4,11 +4,13 @@ import { writable } from "svelte/store";
  * MODAL
  *----------------------------------------------------------------------------*/
 export enum ModalKind {
-    ImageUpload
+    ImageUpload,
+    Settings,
 }
 
 interface ModalProps {
-    [ModalKind.ImageUpload]: {}
+    [ModalKind.ImageUpload]: {},
+    [ModalKind.Settings]: {},
 }
 
 interface ModalState<T extends ModalKind> {

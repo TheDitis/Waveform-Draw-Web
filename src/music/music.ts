@@ -17,7 +17,8 @@ enum BlackNoteKind {
     Flat,
 }
 
-export type NoteNumber = number & 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type WhiteNoteNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type NoteNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 export const octaveNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8] as const;
 export type OctaveNumber = typeof octaveNumbers[number];
 
@@ -98,3 +99,17 @@ export const baseNotePitches = {
     'B': 30.87,
 } as const;
 
+export const noteNumberToNoteMap: Record<NoteNumber, Note> = {
+    0: 'C',
+    1: 'C#',
+    2: 'D',
+    3: 'D#',
+    4: 'E',
+    5: 'F',
+    6: 'F#',
+    7: 'G',
+    8: 'G#',
+    9: 'A',
+    10: 'A#',
+    11: 'B',
+}
