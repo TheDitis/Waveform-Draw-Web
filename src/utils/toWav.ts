@@ -1,8 +1,10 @@
 export function make_download(abuffer, total_samples) {
     let new_file = URL.createObjectURL(bufferToWave(abuffer, total_samples));
     let download_link: HTMLAnchorElement = document.getElementById("download_link") as HTMLAnchorElement;
-    download_link.href = new_file;
-    download_link.download = 'test_waveform.wav';
+    if (download_link) {
+        download_link.href = new_file;
+        download_link.download = 'test_waveform.wav';
+    }
 }
 
 

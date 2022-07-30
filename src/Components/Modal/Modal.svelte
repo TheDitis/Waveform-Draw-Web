@@ -3,6 +3,7 @@
     import ImageUploadModal from "./ImageUploadModal/ImageUploadModal.svelte";
     import SettingsModal from "./SettingsModal/SettingsModal.svelte";
     import { SvelteComponent } from "svelte";
+    import { fade } from "svelte/transition";
 
     const modalComponents: Record<ModalKind, SvelteComponent> = {
         [ModalKind.ImageUpload]: ImageUploadModal,
@@ -13,6 +14,7 @@
 {#if $modalStore !== null}
     <div
         class="modalScrim"
+        transition:fade={{duration: 100}}
         on:click|self={() => {
             setModal(null)
         }}
