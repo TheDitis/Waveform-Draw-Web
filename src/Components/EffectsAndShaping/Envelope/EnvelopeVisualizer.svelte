@@ -1,7 +1,7 @@
 <script lang="ts">
-    import synth from "../../stores/synthStore";
-    import {type ADSRKey, ENVELOPE_LIMITS} from "../../stores/envelopeStore";
-    import {clamp} from "../../utils/utils";
+    import synth from "../../../stores/synthStore";
+    import {type ADSRKey, ENVELOPE_LIMITS} from "../../../stores/envelopeStore";
+    import {clamp} from "../../../utils/utils";
 
     export let width = 600;
     export let height = 180;

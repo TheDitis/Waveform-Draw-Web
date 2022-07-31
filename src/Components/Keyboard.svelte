@@ -9,16 +9,16 @@
 
 <div class="Keyboard">
     <svg
-            style="margin:0"
-            width={keyboardStore.dimensions[0]}
+        style="margin:0"
+        width={keyboardStore.dimensions[0]}
     >
         {#each $keyboardStore as key, index}
             <polygon
-                    on:click={() => keyboardStore.toggleNote(key.notes[0])}
-                    points={keyboardStore.svgPoints(key)}
-                    fill={key.fill}
-                    stroke={key.stroke}
-                    stroke-width={key.strokeWidth}
+                on:click={() => keyboardStore.toggleNote(key.notes[0])}
+                points={keyboardStore.svgPoints(key)}
+                fill={key.fill}
+                stroke={key.stroke}
+                stroke-width={key.strokeWidth}
             />
         {/each}
     </svg>

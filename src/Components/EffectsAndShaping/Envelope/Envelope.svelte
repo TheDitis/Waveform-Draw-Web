@@ -1,8 +1,8 @@
 <script lang="ts">
-    import synth from "../../stores/synthStore";
-    import {ENVELOPE_LIMITS} from "../../stores/envelopeStore";
+    import synth from "../../../stores/synthStore";
+    import {ENVELOPE_LIMITS} from "../../../stores/envelopeStore";
     import EnvelopeVisualizer from "./EnvelopeVisualizer.svelte";
-    import SynthParameter from "../General/SynthParameter.svelte";
+    import SynthParameter from "../../General/SynthParameter.svelte";
 
     const { A, D, S, R, P } = synth.envelope;
 
@@ -26,6 +26,7 @@
 <style>
     .Envelope {
         padding: 10px;
+        margin: 0 20px;
         width: var(--envelopeWidth);
     }
     .knobSection {
