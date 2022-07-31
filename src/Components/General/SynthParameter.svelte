@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Knob from "../General/Knob.svelte";
+    import Knob from "./Knob.svelte";
     import {roundDown} from "../../utils/utils";
 
     export let label;

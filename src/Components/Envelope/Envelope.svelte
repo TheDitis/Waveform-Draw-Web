@@ -2,7 +2,7 @@
     import synth from "../../stores/synthStore";
     import {ENVELOPE_LIMITS} from "../../stores/envelopeStore";
     import EnvelopeVisualizer from "./EnvelopeVisualizer.svelte";
-    import SynthParameter from "./SynthParameter.svelte";
+    import SynthParameter from "../General/SynthParameter.svelte";
 
     const { A, D, S, R, P } = synth.envelope;
 
@@ -11,7 +11,7 @@
     const secondaryColor = primaryColor + '44'
 </script>
 
-<div class="EnvelopeControls" style="--envelopeWidth: {width}px">
+<div class="Envelope" style="--envelopeWidth: {width}px">
     <EnvelopeVisualizer {width}/>
 
     <div class="knobSection">
@@ -24,7 +24,7 @@
 </div>
 
 <style>
-    .EnvelopeControls {
+    .Envelope {
         padding: 10px;
         width: var(--envelopeWidth);
     }

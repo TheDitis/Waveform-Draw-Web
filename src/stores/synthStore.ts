@@ -4,6 +4,7 @@ import {writable} from "svelte/store";
 import {createWaveform} from "./waveformStore";
 import {get} from "svelte/store";
 import {createEnvelope} from "./envelopeStore";
+import { createFilter } from "./filterStore";
 
 const audioCtx = new window.AudioContext();
 const mainGainNode = audioCtx.createGain();
@@ -11,8 +12,9 @@ mainGainNode.gain.value = 0.2;
 mainGainNode.connect(audioCtx.destination);
 
 // TODO: [x] ADSR
-// TODO: [ ] ADSR UI
-// TODO: [ ] Filter
+// TODO: [X] ADSR UI
+// TODO: [X] Filter
+// TODO: [ ] Filter UI
 // TODO: [ ] Select default waveforms (sine, saw, square)
 // TODO: [ ] Fade between multiple waveforms
 // TODO: [ ] Upload image (connect OpenCV python script endpoint)
@@ -29,11 +31,13 @@ export class WaveformOscillatorNode {
     /** Create a new WaveformOscillatorNode
      * @param {AudioBuffer} buffer - actual audio data to load into the node
      * @param {NumberedNote} note - note this oscillator is playing
+     * @param {AudioNode} [output=mainGainNode] - output node to connect this
+     *      oscillator to
      */
-    constructor(buffer: AudioBuffer, note: NumberedNote) {
+    constructor(buffer: AudioBuffer, note: NumberedNote, output: AudioNode) {
         this.note = note;
         this.gain = audioCtx.createGain();
-        this.gain.connect(mainGainNode);
+        this.gain.connect(output);
         this.node = audioCtx.createBufferSource();
         this.node.connect(this.gain);
         this.node.buffer = buffer;
@@ -96,7 +100,9 @@ export class WaveformOscillatorNode {
     }
 }
 
-export type AudioNodesObject = Partial<{ [key in NumberedNote]: WaveformOscillatorNode }>;
+export type AudioNodesObject = Partial<{
+    [key in NumberedNote]: WaveformOscillatorNode
+}>;
 
 const createSynthStore = () => {
     // Object of actively playing audio nodes by note
@@ -104,14 +110,15 @@ const createSynthStore = () => {
 
     const waveform = createWaveform(audioNodes);
     const envelope = createEnvelope();
-
+    const filter = createFilter(audioCtx);
+    filter.node.connect(mainGainNode)
 
     /** Start playing the waveform at the pitch of the given note
      * @param {NumberedNote} note - note to play frequency of
      */
     const play = (note: NumberedNote) => {
         const buffer = waveform.toAudioBuffer(note);
-        const audioNode = new WaveformOscillatorNode(buffer, note);
+        const audioNode = new WaveformOscillatorNode(buffer, note, filter.node);
         audioNode.start(envelope.a, envelope.d, envelope.s, envelope.p)
         audioNodes.update((current) => ({
             ...current,
@@ -135,6 +142,7 @@ const createSynthStore = () => {
     return {
         waveform,
         envelope,
+        filter,
         play,
         stop,
     }

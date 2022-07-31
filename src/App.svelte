@@ -2,11 +2,12 @@
 	import DrawingSection from "./Components/DrawingSection/DrawingSection.svelte";
 	import Keyboard from "./Components/Keyboard.svelte";
 	import KeyEventHandler from "./Components/KeyEventHandler.svelte";
-	import EnvelopeControls from "./Components/EnvelopeControls/EnvelopeControls.svelte";
+	import Envelope from "./Components/Envelope/Envelope.svelte";
 	import Modal from "./Components/Modal/Modal.svelte";
 	import { onMount } from "svelte";
 	let color = "#00ffff";
 	import midiStore from "./stores/midiStore";
+	import Filter from "./Components/Filter/Filter.svelte";
 
 	// TODO: Stop audio refresh when mouse lifted outside of window
 
@@ -18,7 +19,8 @@
 <main style="--color: {color}">
 	<DrawingSection/>
 	<Keyboard/>
-	<EnvelopeControls/>
+	<Filter/>
+	<Envelope/>
 	<KeyEventHandler/>
 	<Modal/>
 </main>
