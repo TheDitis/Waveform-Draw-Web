@@ -9,8 +9,6 @@
 
 	let color = "#00ffff";
 
-	// TODO: Stop audio refresh when mouse lifted outside of window
-
 	onMount(async () => {
 		await midiStore.initialize();
 	})

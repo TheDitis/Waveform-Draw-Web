@@ -18,10 +18,11 @@
     const onMouseDown = (e: MouseEvent) => {
         synth.waveform.addPoint([e.offsetX, e.offsetY]);
         synth.waveform.startDraw();
-    }
-
-    const onMouseUp = (_: MouseEvent) => {
-        synth.waveform.endDraw();
+        const endDraw = () => {
+            synth.waveform.endDraw();
+            window.removeEventListener('mouseup', endDraw)
+        }
+        window.addEventListener('mouseup', endDraw);
     }
 
     const onMove = (e: MouseEvent) => {
@@ -45,7 +46,6 @@
         class="canvas"
         viewBox={viewbox}
         on:mousedown={onMouseDown}
-        on:mouseup={onMouseUp}
         on:mousemove={onMove}
     >
         {#if w && h}
