@@ -15,6 +15,7 @@
 
 
 <div class="Filter" style="--filterWidth: {width}px">
+    <h3 style="color: {primaryColor}">Filter</h3>
     <FilterVisualizer {width} />
 
     <div class="knobSection">
@@ -30,8 +31,13 @@
         margin: 0 20px;
         width: var(--filterWidth);
     }
+    h3 {
+        text-align: left;
+        margin-left: 10px;
+        font-weight: 400;;
+    }
     .knobSection {
         display: flex;
-        margin-top: -35px;
+        margin-top: -15px;
     }
 </style>

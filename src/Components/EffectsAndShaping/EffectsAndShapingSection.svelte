@@ -12,5 +12,6 @@
 <style>
     .EffectsAndShapingSection {
         display: flex;
+        margin-top: -50px;
     }
 </style>

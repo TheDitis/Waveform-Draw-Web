@@ -12,6 +12,8 @@
 </script>
 
 <div class="Envelope" style="--envelopeWidth: {width}px">
+    <h3 style="color: {primaryColor}">Envelope</h3>
+
     <EnvelopeVisualizer {width}/>
 
     <div class="knobSection">
@@ -28,6 +30,11 @@
         padding: 10px;
         margin: 0 20px;
         width: var(--envelopeWidth);
+    }
+    h3 {
+        text-align: left;
+        margin-left: 10px;
+        font-weight: 400;;
     }
     .knobSection {
         margin-top: -15px;

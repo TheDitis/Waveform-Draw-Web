@@ -1,7 +1,7 @@
 <script lang="ts">
 	import DrawingSection from "./Components/DrawingSection/DrawingSection.svelte";
-	import Keyboard from "./Components/Keyboard.svelte";
-	import KeyEventHandler from "./Components/KeyEventHandler.svelte";
+	import Keyboard from "./Components/Keyboard/Keyboard.svelte";
+	import KeyEventHandler from "./Components/Keyboard/KeyEventHandler.svelte";
 	import Modal from "./Components/Modal/Modal.svelte";
 	import { onMount } from "svelte";
 	import midiStore from "./stores/midiStore";

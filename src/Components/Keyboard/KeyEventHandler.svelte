@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { keyboardStore } from "../stores/keyboardStore";
-    import type { NumberedNote } from "../music/music";
+    import { keyboardStore } from "../../stores/keyboardStore";
+    import type { NumberedNote } from "../../music/music";
 
     // Keep track of which NumberedNotes were fired by which Note key, in case octave changes mid-press
     let keysHeld: Partial<Record<NoteKey, NumberedNote>> = {};

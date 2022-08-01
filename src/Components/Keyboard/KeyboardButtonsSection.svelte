@@ -1,28 +1,13 @@
-<script lang="ts">
-    import { keyboardStore } from "../stores/keyboardStore";
+<script>
+    import synthStore from "../../stores/synthStore";
     import { DownloadIcon, ImageIcon, SettingsIcon, Trash2Icon } from "svelte-feather-icons";
-    import { ModalKind, setModal } from "../stores/uiStore";
-    import synthStore from "../stores/synthStore";
+    import { ModalKind, setModal } from "../../stores/uiStore";
 
     const waveformIsValid = synthStore.waveform.isValid
 </script>
 
-<div class="Keyboard">
-    <svg
-        style="margin:0"
-        width={keyboardStore.dimensions[0]}
-    >
-        {#each $keyboardStore as key, index}
-            <polygon
-                on:click={() => keyboardStore.toggleNote(key.notes[0])}
-                points={keyboardStore.svgPoints(key)}
-                fill={key.fill}
-                stroke={key.stroke}
-                stroke-width={key.strokeWidth}
-            />
-        {/each}
-    </svg>
 
+<div class="KeyboardButtonsSection">
     <a>
         <button on:click={synthStore.waveform.clear}>
             <Trash2Icon/>
@@ -54,16 +39,15 @@
             <SettingsIcon/>
         </button>
     </a>
-
 </div>
 
-<style>
-    .Keyboard {
-        width: 100vw;
-        display: flex;
-    }
 
-    .Keyboard svg {
-        width: 100%;
+<style>
+    .KeyboardButtonsSection {
+        width: 50px;
+        float: right;
+    }
+    a {
+        margin: 10px;
     }
 </style>
