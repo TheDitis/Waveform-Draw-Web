@@ -71,10 +71,12 @@ const createKeyboardStore = () => {
      * @param {NumberedNote} note - note to start playing
      */
     const play = (note: NumberedNote) => {
-        notesPlaying.update(
-            (playing) => [...playing, note]
-        );
-        synth.play(note);
+        if (!isPlaying(note)) {
+            notesPlaying.update(
+                (playing) => [...playing, note]
+            );
+            synth.play(note);
+        }
     }
 
     /** Stop playing a given note

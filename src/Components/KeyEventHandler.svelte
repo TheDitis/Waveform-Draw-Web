@@ -1,6 +1,6 @@
 <script lang="ts">
-    import {keyboardStore} from "../stores/keyboardStore";
-    import type {NumberedNote} from "../music/music";
+    import { keyboardStore } from "../stores/keyboardStore";
+    import type { NumberedNote } from "../music/music";
 
     // Keep track of which NumberedNotes were fired by which Note key, in case octave changes mid-press
     let keysHeld: Partial<Record<NoteKey, NumberedNote>> = {};
@@ -43,8 +43,15 @@
      */
     const handleKeyUp = (e: KeyboardEvent) => {
         const key = e.key.toLowerCase();
-        if (key in keyToNoteMap && key in keysHeld) {
-            keyboardStore.stop(keysHeld[key]);
+        if (key in keyToNoteMap) {
+            if (key in keysHeld) {
+                keyboardStore.stop(keysHeld[key]);
+                console.log('here')
+            } else {
+                let oct = keyboardStore.getOctave();
+                if (octaveUpNoteKeys.includes(key) && oct < 8) oct += 1;
+                keyboardStore.stop(`${keyToNoteMap[key]}${oct}` as NumberedNote);
+            }
         }
     }
 </script>
