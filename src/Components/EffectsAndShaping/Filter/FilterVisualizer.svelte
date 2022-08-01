@@ -1,7 +1,6 @@
 <script lang="ts">
     import synthStore from "../../../stores/synthStore";
-    // @ts-ignore
-    import LogScale from 'log-scale';
+    // import LogScale from "../../../utils/LogScale";
 
     const { cutoff, resonance, node: filterNode } = synthStore.filter
     export let width = 600;
@@ -15,29 +14,30 @@
     const quarterHeight = height / 4
     const guideColor = (i: number): string => i % 2 === 0 ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)';
 
-    let path: string;
-    $: {
-        console.log($cutoff, $resonance)
+    const calcPath = (_deps: number[]): string => {
         const nSamples = 1000;
         const freqSamples = new Float32Array(nSamples).map((_, i) => i * (20000 / nSamples));
         let magResponse = new Float32Array(nSamples);
         let _phaseResponse = new Float32Array(nSamples);
         filterNode.getFrequencyResponse(freqSamples, magResponse, _phaseResponse);
-        // const logScale = new LogScale(0, width);
+        // const xLogScale = new LogScale(0, width);
+        // const yLogScale = new LogScale(0, height * 20);
+
         let filterPoints = Array.from(magResponse).flatMap((respAtFreq, i) => {
             const logScaledFreq = freqSamples[i]; // logScale.linearToLogarithmic(freqSamples[i] / 20000);
             const scaledFreq = width * (logScaledFreq / 20000);
-            if (i === 1) {
-                console.log('first: ', scaledFreq);
-            }
-            if (i === magResponse.length - 1) {
-                console.log('last: ', scaledFreq);
-            }
+            // const scaledFreq = xLogScale.linToLog(freqSamples[i] / 20000
+            // const halfHeight = height / 2;
+            // const yScaleFactor = magResponse[0];
             const scaledResponse = respAtFreq * height / 20;
-            return [scaledFreq, (height - scaledResponse)];
-        })
-        path = 'M ' + filterPoints
+            // const scaledResponse = yLogScale.linToLog(respAtFreq / 2);
+            return [scaledFreq, (height - scaledResponse * 10)];
+        });
+        return 'M ' + filterPoints
     }
+
+    let path: string;
+    $: path = calcPath([$cutoff, $resonance])
 </script>
 
 <svg viewBox={`0 0 ${width + 50} ${height + 50}`} width={width + 50} height={height + 50} bind:this={svgRef}>

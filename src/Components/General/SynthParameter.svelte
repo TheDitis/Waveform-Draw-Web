@@ -13,10 +13,8 @@
     export let secondaryColor = '#E7B6DC';
     export let textColor = primaryColor;
     export let unit = '';
+    export let valueDisplayFunction = (v: number): string => roundDown(v).toString() + unit;
 
-    const valueDisplayFunction = (v: number): string => {
-        return roundDown(v).toString() + unit;
-    }
 </script>
 
 <div class="SynthParameter" style="--textColor: {textColor}">

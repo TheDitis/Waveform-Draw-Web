@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.178",
-    "log-scale": "^1.0.1",
     "sirv-cli": "^2.0.1",
     "svelte-knob": "^1.0.2"
   }

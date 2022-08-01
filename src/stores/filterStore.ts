@@ -16,7 +16,7 @@ type FilterLimitsObject = {
  */
 export const FILTER_LIMITS: FilterLimitsObject = {
     'cutoff': { lo: 10, hi: 20000 },
-    'resonance': { lo: 0, hi: 30 },
+    'resonance': { lo: -5, hi: 30 },
 }
 
 interface FilterValues {
@@ -30,7 +30,7 @@ interface FilterValues {
  */
 const DEFAULTS: FilterValues = {
     cutoff: 20_000,
-    resonance: 0,
+    resonance: -2,
     type: 'lowpass',
 }
 
