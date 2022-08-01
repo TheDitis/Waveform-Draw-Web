@@ -24,11 +24,19 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
         `M ${_.flattenDeep($points).join(" ")}`
     ))
     const drawingHeight: Writable<number> = writable(0);
+    const drawingWidth: Writable<number> = writable(0);
 
     /** Whether this represents a valid waveform */
     const isValid = derived(points, $points => $points.length > 2);
 
     let sampleInterval;  // used to update node audio while you draw
+
+    /** Reset waveform to default (flat) */
+    const clear = () => {
+        points.set([[0, get(drawingHeight) / 2], [get(drawingWidth), get(drawingHeight) / 2]]);
+        lastUpdatedIndex.set(0);
+        isDrawing.set(false);
+    }
 
     /** Add a new point to points (called when drawing line)
      * @param {Point} pt - new point to add
@@ -145,9 +153,11 @@ export const createWaveform = (audioNodes: Writable<AudioNodesObject>) => {
             return get(isDrawing)
         },
         drawingHeight,
+        drawingWidth,
         startDraw,
         endDraw,
         toAudioBuffer,
         isValid,
+        clear,
     }
 }

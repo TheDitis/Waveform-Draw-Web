@@ -1,6 +1,6 @@
 <script lang="ts">
     import { keyboardStore } from "../stores/keyboardStore";
-    import { DownloadIcon, ImageIcon, SettingsIcon } from "svelte-feather-icons";
+    import { DownloadIcon, ImageIcon, SettingsIcon, Trash2Icon } from "svelte-feather-icons";
     import { ModalKind, setModal } from "../stores/uiStore";
     import synthStore from "../stores/synthStore";
 
@@ -22,6 +22,12 @@
             />
         {/each}
     </svg>
+
+    <a>
+        <button on:click={synthStore.waveform.clear}>
+            <Trash2Icon/>
+        </button>
+    </a>
 
     {#if $waveformIsValid}
         <a href="" id="download_link">
