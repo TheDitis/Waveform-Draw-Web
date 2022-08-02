@@ -21,6 +21,7 @@
 
 <div class="ImageUploadModal">
     <h2>From Image</h2>
+    <h3 style="color: red;">Coming soon...</h3>
     <p>
         Make a drawing of a waveform (should be like a function, with only 1 y value per x value, unless you want to have jumps in the waveform). Take a picture of that waveform in decent light and focus, and with as little background or competing curvature as possible. Here's an example:
     </p>
@@ -29,7 +30,6 @@
     <IconButton on:click={() => {fileInput.click()}} icon={ImageIcon} style="margin-top: 20px">CHOOSE IMAGE</IconButton>
 
     <input bind:this={fileInput} type="file" on:change={onUpload} accept="image/png, image/jpeg">
-
 </div>
 
 <style>

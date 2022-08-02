@@ -9,6 +9,12 @@
 
 	let color = "#00ffff";
 
+	// TODO: Window resize handling
+	// TODO: Button tooltips
+	// TODO: Warning modals (clicking clear, downloading without a waveform, etc.)
+	// TODO: Filter GUI cleanup & handles
+	// TODO: Reverb
+
 	onMount(async () => {
 		await midiStore.initialize();
 	})
